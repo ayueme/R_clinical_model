@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.302">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>R语言实战临床预测模型 - 16&nbsp; 递归特征消除</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./clinmodel-evalution.html" rel="next">
+<link href="./feature-selection_filter.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./clinmodel-definition.html">模型建立</a></li><li class="breadcrumb-item"><a href="./feature-selection_rfe.html"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">递归特征消除</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R语言实战临床预测模型</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://gitee.com/ayue2019/ayue2019/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-git"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">前言</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">模型建立</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./clinmodel-definition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">什么是临床预测模型？</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">logistic回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Cox回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-rcs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">样条回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-compete-risk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">竞争风险模型列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-essential.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">列线图的本质</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-colorfulbar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">列线图添加彩色风险分层</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-points.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">列线图计算得分及危险分层</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">lasso回归筛选变量</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">常见的变量选择方法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_stepwise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">筛选变量逐步回归</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_unimulti.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">变量筛选之先单后多</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_bestsubset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">变量筛选之最优子集</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_randomforest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">变量筛选之随机森林</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_filter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">单变量过滤法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_rfe.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">递归特征消除</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">模型评价</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./clinmodel-evalution.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-binominal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">二分类资料ROC曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-survive.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">生存资料ROC曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-bestcut-smooth.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">ROC曲线的最佳截点和平滑曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">ROC曲线的显著性检验</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-two.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">ROC的两面性</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-ggplot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">ROC曲线ggplot2绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-attention.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">R语言计算AUC(ROC)注意事项</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-many.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">多指标联合诊断的ROC曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">C-index的计算</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cindex-compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">C-index的比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./conf_matrix-3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">三维混淆矩阵</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nri.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">NRI净重新分类指数</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./idi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">30</span>&nbsp; <span class="chapter-title">IDI综合判别改善指数</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">31</span>&nbsp; <span class="chapter-title">logistic回归校准曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-logistic-test.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">32</span>&nbsp; <span class="chapter-title">logistic回归测试集校准曲线的绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">33</span>&nbsp; <span class="chapter-title">Cox回归校准曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-cox-test.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">34</span>&nbsp; <span class="chapter-title">Cox回归测试集校准曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-tidymodels-man.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">35</span>&nbsp; <span class="chapter-title">tidymodels手动绘制校准曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-tidymodels.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">36</span>&nbsp; <span class="chapter-title">tidymodels已原生支持校准曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-mlr3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">37</span>&nbsp; <span class="chapter-title">mlr3绘制校准曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-qhscrnomo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">38</span>&nbsp; <span class="chapter-title">竞争风险模型的校准曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">39</span>&nbsp; <span class="chapter-title">分类数据的决策曲线分析</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">40</span>&nbsp; <span class="chapter-title">生存数据的决策曲线分析</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-diy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">41</span>&nbsp; <span class="chapter-title">适用于一切模型的决策曲线分析</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">模型比较</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_tidymodels.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">42</span>&nbsp; <span class="chapter-title">tidymodels实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">43</span>&nbsp; <span class="chapter-title">workflow实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_mlr3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">44</span>&nbsp; <span class="chapter-title">mlr3实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_caret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">45</span>&nbsp; <span class="chapter-title">caret实现多模型比较</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">附录</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data-preprocess.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">常见的数据预处理方法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data-split.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./9999-appendix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">软件安装及其他合集</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目录</h2>
+   
+  <ul>
+  <li><a href="#rfeiter" id="toc-rfeiter" class="nav-link active" data-scroll-target="#rfeiter"><span class="header-section-number">16.1</span> rfeIter</a></li>
+  <li><a href="#交叉验证rfe" id="toc-交叉验证rfe" class="nav-link" data-scroll-target="#交叉验证rfe"><span class="header-section-number">16.2</span> 交叉验证rfe</a></li>
+  <li><a href="#caret实操" id="toc-caret实操" class="nav-link" data-scroll-target="#caret实操"><span class="header-section-number">16.3</span> caret实操</a>
+  <ul class="collapse">
+  <li><a href="#线性回归" id="toc-线性回归" class="nav-link" data-scroll-target="#线性回归"><span class="header-section-number">16.3.1</span> 线性回归</a></li>
+  <li><a href="#随机森林" id="toc-随机森林" class="nav-link" data-scroll-target="#随机森林"><span class="header-section-number">16.3.2</span> 随机森林</a></li>
+  <li><a href="#支持向量机" id="toc-支持向量机" class="nav-link" data-scroll-target="#支持向量机"><span class="header-section-number">16.3.3</span> 支持向量机</a></li>
+  </ul></li>
+  <li><a href="#多个模型比较" id="toc-多个模型比较" class="nav-link" data-scroll-target="#多个模型比较"><span class="header-section-number">16.4</span> 多个模型比较</a>
+  <ul class="collapse">
+  <li><a href="#knn调参" id="toc-knn调参" class="nav-link" data-scroll-target="#knn调参"><span class="header-section-number">16.4.1</span> knn+调参</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">递归特征消除</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<blockquote class="blockquote">
+<p>本文节选自R语言机器学习系列合集。</p>
+</blockquote>
+<p>前面的推文已经给大家介绍了机器学习中特征选择的常见方法，以及目前在R语言中的实现情况，主要就是3个包：<code>caret</code>、<code>mlr3</code>、<code>tidymodels</code></p>
+<ul>
+<li><a href="https://mp.weixin.qq.com/s/UoxzJKqjPjvTJb0Z84-FqQ">机器学习中的特征选择(变量筛选)方法简介</a></li>
+</ul>
+<p>今天给大家介绍<code>caret</code>中的递归特征消除法。</p>
+<p>递归特征消除(recursive feature elimination，rfe)是变量筛选的方法之一，属于包装法，同时也是向后选择法。</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="注意">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+注意
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>大家在医学相关的SCI中见的比较多的应该是<strong>支持向量机的递归特征消除</strong>，但是rfe只是一种方法，除了支持向量机，还有非常多的算法(模型)可以与递归特征消除一起使用，比如随机森林、线性回归、朴素贝叶斯等等。</p>
+</div>
+</div>
+<p><code>caret</code>中的<code>rfe</code>的基本做法是这样的：对模型进行多次训练，每次训练后消除不重要的特征（这个可以用变量重要性、变量的系数等衡量，不同算法有不同的衡量标准），再使用剩下的特征继续训练。</p>
+<p>在<code>caret</code>中通过<code>rfeIter</code>和<code>rfe</code>分别实现递归特征消除和交叉验证的递归特征消除。</p>
+<section id="rfeiter" class="level2" data-number="16.1">
+<h2 data-number="16.1" class="anchored" data-anchor-id="rfeiter"><span class="header-section-number">16.1</span> rfeIter</h2>
+<p>做法如下：</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> 在训练集中使用所有的预测变量进行建模</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> 计算模型表现</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> 计算变量重要性并进行排序</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fl">4.</span> 对每一个样本量大小为S[i]，i <span class="ot">=</span> <span class="dv">1</span>,<span class="dv">2</span>...,S的子集</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fl">5.</span>    保留S[i]个最重要的变量</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fl">6.</span>    [可选]预处理数据</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fl">7.</span>    用保留的S[i]个变量在训练集中建模</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fl">8.</span>    计算模型表现</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fl">9.</span>    [可选]重新计算变量重要性</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fl">10.</span> 结束</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fl">11.</span> 计算每个子集的模型表现</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fl">12.</span> 决定合适的变量个数（即最优的模型对应的变量）</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fl">13.</span> 使用最优的变量拟合最终的模型</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="交叉验证rfe" class="level2" data-number="16.2">
+<h2 data-number="16.2" class="anchored" data-anchor-id="交叉验证rfe"><span class="header-section-number">16.2</span> 交叉验证rfe</h2>
+<p>单纯的递归特征消除容易出现过拟合问题，所以出现了<strong>交叉验证的递归特征消除(rfecv)</strong>。rfecv实现了对整个变量选择过程的重抽样，因此可以获得更加准确的结果。</p>
+<p>它的步骤如下：</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> 对每一次重抽样做以下事情：</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fl">1.</span> 重抽样把数据划分为训练集<span class="sc">/</span>测试集</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">2.</span> 使用训练集中的所有预测变量进行建模</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fl">3.</span> 计算模型表现</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fl">4.</span> 计算变量重要性或者排序</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fl">5.</span> 对每一个样本量大小为S[i]，i <span class="ot">=</span> <span class="dv">1</span>,<span class="dv">2</span>...,S的子集：</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.</span> 保留S[i]个最重要的变量</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fl">2.</span> [可选]预处理数据</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fl">3.</span> 用保留的S[i]个变量在训练集中建模</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fl">4.</span> 在测试集计算模型表现</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="fl">5.</span> [可选]重新计算变量重要性</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fl">6.</span> 结束</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> 结束</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> 在测试集中计算每个子集的模型表现</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fl">4.</span> 决定合适的预测变量数量</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fl">4.</span> 决定最终的预测变量</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fl">5.</span> 用最初的训练集和最终的预测变量拟合最终模型</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>rfecv</code>包含两层循环，举个例子，比如最开始的一层循环我们是用10折交叉验证，10折交叉验证把数据分为10份，其中9折用来进行变量选择，剩下的1折用来评估每个变量子集的模型表现。整个变量选择的过程会重复进行10次，最终会得到10个变量子集，选择最好的那个，然后拟合最终的模型。</p>
+<p>说起来蛮复杂的，不理解也问题不大，我知道你们只是想要一个牛逼的结果而已……</p>
+<p>上面这么多步骤只需要<code>rfe</code>函数即可完成，不用担心，简单得很！</p>
+<p>以下是交叉验证递归特征消除的演示，使用<code>rfe</code>函数实现，<code>rfeIter</code>就不演示了。</p>
+</section>
+<section id="caret实操" class="level2" data-number="16.3">
+<h2 data-number="16.3" class="anchored" data-anchor-id="caret实操"><span class="header-section-number">16.3</span> caret实操</h2>
+<p><code>caret</code>支持非常多的模型，可以做递归特征消除，有几个是已经预定义好的，可以写上名字直接用：</p>
+<ul>
+<li>线性回归<code>lmFuncs</code>，</li>
+<li>线性判别分析<code>ldaFuncs</code>，</li>
+<li>广义线性模型<code>gamFuncs</code></li>
+<li>逻辑回归<code>lrFuncs</code></li>
+<li>随机森林<code>rfFuncs</code>，</li>
+<li>朴素贝叶斯<code>nbFuncs</code>，</li>
+<li>袋装树<code>treebagFuncs</code></li>
+</ul>
+<p>除此之外，所有<code>train()</code>函数可以用的模型，都能做递归特征消除。下面会演示用法。如果你不知道<code>train</code>能用的模型有哪些，参考这篇推文：caret可视化</p>
+<p><code>caret</code>中通过<code>rfe</code>实现交叉验证的递归特征消除，<code>rfe</code>函数有几个主要的参数：</p>
+<ul>
+<li><code>x</code>：预测变量，可以是矩阵或者数据框</li>
+<li><code>y</code>：结果变量，需要数值型或者因子型向量，a vector (numeric or factor) of outcomes</li>
+<li><code>sizes</code>：整数型向量，每次迭代留下的重要性比较高的特征数量，结合下面的例子理解</li>
+<li><code>metric</code>：模型评价指标，分类默认Accuracy和Kappa，回归默认RMSE和MAE</li>
+<li><code>rfecontrol</code>：选择算法，重抽样方法等</li>
+</ul>
+<p>用<code>caret</code>自带的<code>BloodBrain</code>数据集进行演示。</p>
+<p>Mente和Lombardo(2005)开发了预测大脑中化合物浓度与血液中化合物浓度比值对数的模型。对于每一种化合物，他们计算了三组描述分子的变量:MOE 2D、rule-of-five和Charge Polar Surface Area (CPSA)。</p>
+<p>其中数据集<code>bbbDescr</code>总共有134列(134个描述分子性质的预测变量)，208行(208个分子化合物)。向量<code>logBBB</code>是浓度比值的对数，是结果变量。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Loading required package: ggplot2</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Warning: package 'ggplot2' was built under R version 4.2.3</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Loading required package: lattice</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 加载后会在当前环境下出现自变量数据框bbbDescr，因变量是logBBB</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(BloodBrain)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>psych<span class="sc">::</span><span class="fu">headTail</span>(bbbDescr)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="do">##      tpsa nbasic negative vsa_hyd a_aro weight peoe_vsa.0 peoe_vsa.1 peoe_vsa.2</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 1   12.03      1        0  167.07     0 156.29      76.95      43.45          0</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 2   49.33      0        0   92.64     6 151.16      38.24      25.52          0</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 3   50.53      1        0  295.17    15 366.48      58.05     124.74      21.65</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   37.39      0        0  319.11    15 382.55      62.24     124.74      13.19</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="do">## ...   ...    ...      ...     ...   ...    ...        ...        ...        ...</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 205  3.24      0        0  343.24    10 292.45       40.6     104.68      13.19</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 206 32.34      1        0  234.79     6 261.39      75.12      86.67          0</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 207  37.3      0        0  124.26     0 143.21      63.98      14.71          0</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 208 64.43      0        0  224.75    10 319.38      74.42      43.65      29.69</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="do">##     peoe_vsa.3 peoe_vsa.4 peoe_vsa.5 peoe_vsa.6 peoe_vsa.0.1 peoe_vsa.1.1</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 1            0          0          0      17.24        18.75        43.51</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 2         8.62      23.27          0          0        49.02            0</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 3         8.62      17.44          0       8.62        83.82        49.02</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="do">## 4        21.79          0          0       8.62        83.82        68.78</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="do">## ...        ...        ...        ...        ...          ...          ...</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 205          0          0          0       8.62        85.17        117.4</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 206       8.62      12.95          0       8.62        34.07        62.01</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 207          0          0          0          0         17.4         54.9</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 208        6.7          0      12.95      14.71        82.73        19.76</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="do">##     peoe_vsa.2.1 peoe_vsa.3.1 peoe_vsa.4.1 peoe_vsa.5.1 peoe_vsa.6.1 a_acc</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="do">## 1              0            0            0            0            0     0</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="do">## 2              0            0            0        13.57          7.9     2</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="do">## 3              0            0         5.68          2.5         2.64     2</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 4              0            0         5.68            0         2.64     2</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="do">## ...          ...          ...          ...          ...          ...   ...</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 205            0            0            0            0            0     0</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="do">## 206            0            0            0        13.57         0.14     1</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="do">## 207            0            0            0            0        27.13     0</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="do">## 208            0            0         5.68        27.13          2.5     4</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="do">##     a_acid a_base vsa_acc vsa_acid vsa_base vsa_don vsa_other vsa_pol</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="do">## 1        0      1       0        0     5.68    5.68         0       0</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="do">## 2        0      0   13.57        0        0    5.68     28.11   13.57</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="do">## 3        0      1    8.19        0        0    5.68     43.56       0</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="do">## 4        0      1    8.19        0        0    5.68     28.32       0</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="do">## ...    ...    ...     ...      ...      ...     ...       ...     ...</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="do">## 205      0      1       0        0        0       0         0       0</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="do">## 206      0      1   13.57        0        0    5.68     19.65       0</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="do">## 207      2      0   27.13    27.13        0       0     14.71       0</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="do">## 208      0      0   35.32        0        0       0     47.76       0</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="do">##     slogp_vsa0 slogp_vsa1 slogp_vsa2 slogp_vsa3 slogp_vsa4 slogp_vsa5</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="do">## 1        18.01          0       3.98          0       4.41       32.9</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="do">## 2        25.39      23.27      23.86          0          0          0</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="do">## 3        14.12       34.8          0      76.25       3.19       9.51</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="do">## 4        14.12       34.8          0      76.25       3.19          0</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="do">## ...        ...        ...        ...        ...        ...        ...</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="do">## 205       3.12          0          0       52.5       3.19       32.9</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="do">## 206       3.12      23.27      23.86      55.32       6.37      37.74</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="do">## 207      42.68       1.46      23.86          0       4.41          0</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="do">## 208          0      34.81         11          0       54.6       32.9</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="do">##     slogp_vsa6 slogp_vsa7 slogp_vsa8 slogp_vsa9 smr_vsa0 smr_vsa1 smr_vsa2</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="do">## 1            0          0     113.21      33.33        0    18.01     4.41</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="do">## 2            0      70.57          0      41.33    23.86    25.39        0</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="do">## 3            0     148.13      75.47      28.27    12.63    27.79        0</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="do">## 4            0     144.04      75.47      55.46     3.12    27.79        0</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="do">## ...        ...        ...        ...        ...      ...      ...      ...</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="do">## 205          0     163.93          0     118.42     3.12        0        0</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="do">## 206          0      52.93      37.74      69.41    26.99        0        0</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="do">## 207          0          0      75.47      66.65    66.55        0     4.41</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="do">## 208          0         53          0      149.7    58.72    21.81        0</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="do">##     smr_vsa3 smr_vsa4 smr_vsa5 smr_vsa6 smr_vsa7 tpsa.1 logp.o.w. frac.anion7.</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="do">## 1       3.98        0   113.21        0    66.22  16.61      2.95            0</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="do">## 2       5.24    20.77    70.57     5.26    33.33  49.33      0.89            0</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="do">## 3       8.43    29.58   235.06    76.25        0  51.73      4.44            0</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="do">## 4       8.43     21.4   235.06    76.25    31.28  38.59      5.25            0</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="do">## ...      ...      ...      ...      ...      ...    ...       ...          ...</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="do">## 205    37.25     5.15   177.23    18.44   132.88   4.44      5.89            0</span></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="do">## 206     6.37    20.77    128.4    60.58    66.65  33.54      3.02            0</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="do">## 207        0        0    75.47     1.46    66.65  40.13      2.65         0.99</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="do">## 208     6.87     2.76    68.68       13   164.15  64.43       1.6            0</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a><span class="do">##     frac.cation7. andrewbind rotatablebonds mlogp clogp     mw nocount hbdnr</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="do">## 1               1        3.4              3   2.5  2.97 155.29       1     1</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="do">## 2               0       -3.3              2  1.06  0.49 151.17       3     2</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="do">## 3            0.99       12.8              8  4.66  5.14 365.48       5     1</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="do">## 4            0.99       12.8              8  3.82  5.88 381.54       4     1</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="do">## ...           ...        ...            ...   ...   ...    ...     ...   ...</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="do">## 205          0.54        7.3              6  4.98  5.96 291.44       1     0</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="do">## 206             1        8.6              7  2.63   2.8 260.38       3     1</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="do">## 207             0       -3.7              5  2.06  2.76 144.22       2     1</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="do">## 208             0        6.2              3  1.66  1.36 319.39       6     0</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="do">##     rule.of.5violations alert prx  ub pol inthb  adistm adistd polar_area</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="do">## 1                     0     0   0   0   0     0       0      0      21.12</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="do">## 2                     0     0   1   3   2     0  395.38  10.89     117.41</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a><span class="do">## 3                     1     0   6 5.3   3     0 1364.55  25.68      82.09</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a><span class="do">## 4                     1     0   2 5.3   3     0  702.64  10.02      65.09</span></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="do">## ...                 ...   ... ... ... ...   ...     ...    ...        ...</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a><span class="do">## 205                   1     0   0 4.7   0     0       0      0       4.67</span></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="do">## 206                   0     0   1   3   1     0  419.76   8.41      93.71</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="do">## 207                   0     0   2   1   0     0  101.76  20.84      76.85</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="do">## 208                   0     0   5 4.7   2     0 1208.28  43.16      73.62</span></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="do">##     nonpolar_area psa_npsa tcsa tcpa tcnp ovality surface_area  volume</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="do">## 1          379.07     0.06 0.01 0.18 0.01     1.1       400.19  656.07</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a><span class="do">## 2          247.54     0.47 0.01 0.04 0.02    1.12       364.95   555.1</span></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="do">## 3          637.72     0.13 0.01  0.1 0.01     1.3       719.82 1224.46</span></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a><span class="do">## 4          667.97      0.1 0.01 0.12 0.01     1.3       733.06  1257.2</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a><span class="do">## ...           ...      ...  ...  ...  ...     ...          ...     ...</span></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a><span class="do">## 205        623.48     0.01 0.01 1.09 0.01    1.24       628.14 1072.64</span></span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a><span class="do">## 206         452.7     0.21 0.01 0.07 0.01    1.18       546.41  931.18</span></span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a><span class="do">## 207        292.74     0.26 0.01 0.05 0.01    1.09       369.58  586.54</span></span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a><span class="do">## 208        482.03     0.15 0.01  0.1 0.01    1.18       555.65  959.84</span></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a><span class="do">##     most_negative_charge most_positive_charge sum_absolute_charge dipole_moment</span></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="do">## 1                  -0.62                 0.31                3.89          1.19</span></span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a><span class="do">## 2                  -0.84                  0.5                4.89          4.21</span></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a><span class="do">## 3                   -0.8                 0.54                7.98          3.52</span></span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a><span class="do">## 4                  -0.76                 0.48                7.93          3.15</span></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a><span class="do">## ...                  ...                  ...                 ...           ...</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a><span class="do">## 205                 -0.4                 0.14                 5.1          0.49</span></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a><span class="do">## 206                 -0.8                  0.5                6.66          4.14</span></span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a><span class="do">## 207                -0.51                 0.41                4.21          1.61</span></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a><span class="do">## 208                -0.77                 0.59                7.13          2.93</span></span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a><span class="do">##      homo  lumo hardness  ppsa1   ppsa2 ppsa3  pnsa1   pnsa2  pnsa3 fpsa1 fpsa2</span></span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="do">## 1   -9.67   3.4     6.54 349.14  679.38 30.97  51.06  -99.35 -10.49  0.87   1.7</span></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a><span class="do">## 2   -8.96  0.19     4.58 223.13  545.83  42.3 141.81 -346.91 -44.04  0.61   1.5</span></span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a><span class="do">## 3   -8.63  0.06     4.34 517.82 2066.02 63.95    202 -805.93 -43.76  0.72  2.87</span></span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   -8.56 -0.27     4.15 507.61 2012.91 61.69 225.45 -893.99 -42.03  0.69  2.75</span></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a><span class="do">## ...   ...   ...      ...    ...     ...   ...    ...     ...    ...   ...   ...</span></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a><span class="do">## 205 -8.72 -0.36     4.18 443.86 1132.32 45.54 184.28 -470.11 -24.72  0.71   1.8</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a><span class="do">## 206 -9.08   0.1     4.59 382.32 1272.66 48.96 164.09 -546.24 -44.86   0.7  2.33</span></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a><span class="do">## 207 -10.9  1.31     6.11  287.3  604.89 34.14  82.28 -173.23 -27.97  0.78  1.64</span></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a><span class="do">## 208 -9.65 -1.21     4.22 407.36  1453.1 47.58 148.29 -528.97 -38.48  0.73  2.62</span></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a><span class="do">##     fpsa3 fnsa1 fnsa2 fnsa3  wpsa1   wpsa2 wpsa3  wnsa1   wnsa2  wnsa3  dpsa1</span></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a><span class="do">## 1    0.08  0.13 -0.25 -0.03 139.72  271.89 12.39  20.43  -39.76   -4.2 298.08</span></span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a><span class="do">## 2    0.12  0.39 -0.95 -0.12  81.43   199.2 15.44  51.75  -126.6 -16.07  81.32</span></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a><span class="do">## 3    0.09  0.28 -1.12 -0.06 372.74 1487.16 46.03  145.4 -580.12  -31.5 315.83</span></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a><span class="do">## 4    0.08  0.31 -1.22 -0.06 372.11 1475.58 45.22 165.27 -655.35 -30.81 282.17</span></span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="do">## ...   ...   ...   ...   ...    ...     ...   ...    ...     ...    ...    ...</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a><span class="do">## 205  0.07  0.29 -0.75 -0.04 278.81  711.26  28.6 115.75  -295.3 -15.53 259.58</span></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a><span class="do">## 206  0.09   0.3    -1 -0.08  208.9  695.39 26.75  89.66 -298.47 -24.51 218.22</span></span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="do">## 207  0.09  0.22 -0.47 -0.08 106.18  223.56 12.62  30.41  -64.02 -10.34 205.03</span></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="do">## 208  0.09  0.27 -0.95 -0.07 226.35  807.42 26.44   82.4 -293.92 -21.38 259.07</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="do">##       dpsa2  dpsa3 rpcg rncg wpcs wncs sadh1 sadh2 sadh3 chdh1 chdh2 chdh3</span></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a><span class="do">## 1    778.73  41.46 0.16 0.32 2.38 1.91  15.1  15.1  0.04  0.31  0.31     0</span></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a><span class="do">## 2    892.75  86.34  0.2 0.34 1.31 2.25 45.22 22.61  0.12   0.8   0.4     0</span></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a><span class="do">## 3   2871.95 107.71 0.14  0.2 1.14 1.57 16.72 16.72  0.02  0.46  0.46     0</span></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   2906.89 103.72 0.12 0.19 0.76 1.53 17.25 17.25  0.02  0.44  0.44     0</span></span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a><span class="do">## ...     ...    ...  ...  ...  ...  ...   ...   ...   ...   ...   ...   ...</span></span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a><span class="do">## 205 1602.43  70.26 0.06 0.16 1.15 0.73     0     0     0     0     0     0</span></span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a><span class="do">## 206 1818.89  93.82 0.15 0.24  1.3 2.66 23.17 23.17  0.04  0.43  0.43     0</span></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a><span class="do">## 207  778.12  62.11 0.19 0.24 0.86 3.84  30.8  30.8  0.08   0.4   0.4     0</span></span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a><span class="do">## 208 1982.08  86.06 0.16 0.22 0.92 0.13     0     0     0     0     0     0</span></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a><span class="do">##     scdh1 scdh2 scdh3 saaa1 saaa2 saaa3 chaa1 chaa2 chaa3  scaa1  scaa2 scaa3</span></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a><span class="do">## 1    4.63  4.63  0.01  6.03  6.03  0.02 -0.62 -0.62     0  -3.72  -3.72 -0.01</span></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a><span class="do">## 2   17.62  8.81  0.05 65.62 32.81  0.18 -0.84 -0.42     0 -27.51 -13.76 -0.08</span></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a><span class="do">## 3    7.61  7.61  0.01 57.54 14.39  0.08 -1.37 -0.34     0 -21.79  -5.45 -0.03</span></span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a><span class="do">## 4    7.51  7.51  0.01 39.86 13.29  0.05 -1.23 -0.41     0  -17.6  -5.87 -0.02</span></span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a><span class="do">## ...   ...   ...   ...   ...   ...   ...   ...   ...   ...    ...    ...   ...</span></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a><span class="do">## 205     0     0     0  4.67  4.67  0.01  -0.4  -0.4     0  -1.86  -1.86     0</span></span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a><span class="do">## 206  9.97  9.97  0.02 59.43 29.72  0.11 -0.79 -0.39     0 -22.21 -11.11 -0.04</span></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a><span class="do">## 207 12.34 12.34  0.03 46.05 23.02  0.12 -0.93 -0.46     0 -20.72 -10.36 -0.06</span></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a><span class="do">## 208     0     0     0 71.59  17.9  0.13  -1.4 -0.35     0 -24.58  -6.14 -0.04</span></span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a><span class="do">##     ctdh ctaa mchg achg rdta n_sp2 n_sp3 o_sp2 o_sp3</span></span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      1    1 0.92 0.92    1     0  6.03     0     0</span></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a><span class="do">## 2      2    2 1.27 1.04    1     0  6.57 32.01 33.61</span></span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a><span class="do">## 3      1    4 1.26 1.26 0.25 26.97 10.86     0 27.55</span></span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a><span class="do">## 4      1    3  1.2  1.2 0.33 21.71    11     0 15.13</span></span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a><span class="do">## ...  ...  ...  ...  ...  ...   ...   ...   ...   ...</span></span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a><span class="do">## 205    0    1    0    0    0     0  4.67     0     0</span></span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a><span class="do">## 206    1    2 1.23 1.23  0.5     0 16.18 54.36     0</span></span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a><span class="do">## 207    1    2 0.91 0.91  0.5     0     0  30.1 15.94</span></span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a><span class="do">## 208    0    4    0    0    0 26.67  2.03 40.46  4.47</span></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(logBBB)</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a><span class="do">## [1]  1.08 -0.40  0.22  0.14  0.69  0.44</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>首先对这个数据做一下数据预处理，如果你看不懂下面这段代码，强烈建议你先看前面的推文：<a href="https://mp.weixin.qq.com/s/A5CrI7S8NgMtSS4OrNnBZg">R语言机器学习caret-02：数据预处理</a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">scale</span>(bbbDescr[,<span class="sc">-</span><span class="fu">nearZeroVar</span>(bbbDescr)])</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> x[, <span class="sc">-</span><span class="fu">findCorrelation</span>(<span class="fu">cor</span>(x), .<span class="dv">8</span>)]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(x, <span class="at">stringsAsFactors =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>psych<span class="sc">::</span><span class="fu">headTail</span>(x)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="do">##     nbasic peoe_vsa.0 peoe_vsa.1 peoe_vsa.2 peoe_vsa.3 peoe_vsa.4 peoe_vsa.5</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1.31        0.4      -0.81      -0.88      -0.76      -0.63      -0.56</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 2    -0.76      -0.72      -1.25      -0.88      -0.16        1.9      -0.56</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     1.31      -0.15       1.22       0.39      -0.16       1.27      -0.56</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 4    -0.76      -0.03       1.22       -0.1       0.74      -0.63      -0.56</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ...    ...        ...        ...        ...        ...        ...        ...</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 205  -0.76      -0.66       0.72       -0.1      -0.76      -0.63      -0.56</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 206   1.31       0.35       0.27      -0.88      -0.16       0.78      -0.56</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 207  -0.76       0.02      -1.52      -0.88      -0.76      -0.63      -0.56</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 208  -0.76       0.33       -0.8       0.87      -0.29      -0.63       1.27</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="do">##     peoe_vsa.6 peoe_vsa.0.1 peoe_vsa.1.1 peoe_vsa.4.1 peoe_vsa.5.1 peoe_vsa.6.1</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 1         0.07         -0.9        -0.29        -0.61        -0.81        -0.69</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 2         -1.3         0.16        -1.36        -0.61         0.51         0.16</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 3        -0.62         1.38        -0.16         0.24        -0.56        -0.41</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 4        -0.62         1.38         0.32         0.24        -0.81        -0.41</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="do">## ...        ...          ...          ...          ...          ...          ...</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 205      -0.62         1.42         1.51        -0.61        -0.81        -0.69</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 206      -0.62        -0.36         0.16        -0.61         0.51        -0.68</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 207       -1.3        -0.95        -0.02        -0.61        -0.81         2.24</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="do">## 208      -0.13         1.34        -0.87         0.24         1.83        -0.42</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="do">##     a_acc a_base vsa_base vsa_other vsa_pol slogp_vsa0 slogp_vsa1 slogp_vsa2</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 1   -1.45  -0.14     0.04     -1.74   -0.51      -0.55      -1.13      -0.66</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 2   -0.06  -1.04    -0.58      0.08    1.51      -0.24        0.3       0.43</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 3   -0.06  -0.14    -0.58      1.08   -0.51      -0.71       1.01      -0.87</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   -0.06  -0.14    -0.58       0.1   -0.51      -0.71       1.01      -0.87</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="do">## ...   ...    ...      ...       ...     ...        ...        ...        ...</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="do">## 205 -1.45  -0.14    -0.58     -1.74   -0.51      -1.17      -1.13      -0.87</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="do">## 206 -0.75  -0.14    -0.58     -0.47   -0.51      -1.17        0.3       0.43</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="do">## 207 -1.45  -1.04    -0.58     -0.78   -0.51       0.48      -1.04       0.43</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 208  1.33  -1.04    -0.58      1.35   -0.51       -1.3       1.01      -0.27</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="do">##     slogp_vsa4 slogp_vsa5 slogp_vsa6 slogp_vsa8 slogp_vsa9 smr_vsa0 smr_vsa1</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 1        -0.46       0.13      -0.51       2.67      -0.64    -0.99    -0.41</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="do">## 2        -0.85      -0.98      -0.51      -0.93      -0.45    -0.06    -0.14</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="do">## 3        -0.57      -0.66      -0.51       1.47      -0.76     -0.5    -0.06</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="do">## 4        -0.57      -0.98      -0.51       1.47      -0.11    -0.87    -0.06</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="do">## ...        ...        ...        ...        ...        ...      ...      ...</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="do">## 205      -0.57       0.13      -0.51      -0.93       1.38    -0.87    -1.07</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="do">## 206      -0.29        0.3      -0.51       0.27       0.22     0.06    -1.07</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="do">## 207      -0.46      -0.98      -0.51       1.47       0.15     1.59    -1.07</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="do">## 208       3.91       0.13      -0.51      -0.93       2.12     1.29    -0.27</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="do">##     smr_vsa2 smr_vsa3 smr_vsa4 smr_vsa6 smr_vsa7 frac.cation7. andrewbind</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="do">## 1       -0.5    -0.87    -0.64    -1.21    -0.01          0.81      -0.98</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="do">## 2      -0.74    -0.74     0.95    -1.03    -0.78         -1.39      -2.02</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="do">## 3      -0.74     -0.4     1.62     1.42    -1.57          0.78       0.48</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="do">## 4      -0.74     -0.4        1     1.42    -0.83          0.78       0.48</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="do">## ...      ...      ...      ...      ...      ...           ...        ...</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="do">## 205    -0.74     2.63    -0.25    -0.58     1.55          -0.2      -0.38</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="do">## 206    -0.74    -0.62     0.95     0.88        0           0.8      -0.18</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="do">## 207     -0.5    -1.29    -0.64    -1.16        0         -1.39      -2.09</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="do">## 208    -0.74    -0.57    -0.43    -0.76     2.29         -1.39      -0.55</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="do">##     rotatablebonds mlogp clogp rule.of.5violations   prx    ub   pol inthb</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="do">## 1            -0.54 -0.19  0.15               -0.48 -1.01 -3.27 -1.36 -0.24</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="do">## 2            -0.86 -1.44 -1.18               -0.48 -0.67 -0.94  0.19 -0.24</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="do">## 3             1.09  1.67  1.32                1.69  1.01  0.85  0.97 -0.24</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="do">## 4             1.09  0.95  1.72                1.69 -0.34  0.85  0.97 -0.24</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="do">## ...            ...   ...   ...                 ...   ...   ...   ...   ...</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="do">## 205           0.44  1.95  1.77                1.69 -1.01  0.39 -1.36 -0.24</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="do">## 206           0.76 -0.08  0.06               -0.48 -0.67 -0.94 -0.58 -0.24</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="do">## 207           0.11 -0.57  0.04               -0.48 -0.34 -2.49 -1.36 -0.24</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="do">## 208          -0.54 -0.92 -0.71               -0.48  0.67  0.39  0.19 -0.24</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="do">##     adistd  tcsa  tcpa ovality most_negative_charge most_positive_charge</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     -0.9 -1.03  0.16   -1.47                 0.54                -0.93</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="do">## 2    -0.59   0.2 -0.41   -1.13                -0.53                -0.14</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="do">## 3    -0.16 -0.57 -0.19    1.83                -0.35                 0.04</span></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="do">## 4    -0.61 -0.67 -0.09    1.84                -0.15                -0.21</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="do">## ...    ...   ...   ...     ...                  ...                  ...</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a><span class="do">## 205   -0.9 -1.56  3.82    0.84                 1.59                 -1.6</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="do">## 206  -0.66  -0.2  -0.3   -0.04                -0.33                -0.11</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="do">## 207   -0.3 -0.47 -0.36   -1.56                 1.07                -0.52</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="do">## 208   0.34     0 -0.19    -0.1                -0.19                 0.23</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="do">##     dipole_moment  homo  lumo hardness pnsa1 fpsa3 fnsa1 fnsa2  rpcg  rncg</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a><span class="do">## 1           -1.17 -0.96  6.88     5.08 -2.48 -0.63 -2.47  2.15  0.14   1.5</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a><span class="do">## 2            0.63   0.1   0.7     0.36 -0.92  1.35  0.44  0.64  0.98  1.88</span></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="do">## 3            0.22   0.6  0.44    -0.21  0.12 -0.04 -0.76  0.28 -0.26 -0.19</span></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a><span class="do">## 4           -0.01   0.7 -0.18    -0.68  0.52 -0.28 -0.46  0.06 -0.53 -0.32</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a><span class="do">## ...           ...   ...   ...      ...   ...   ...   ...   ...   ...   ...</span></span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a><span class="do">## 205         -1.58  0.46 -0.37     -0.6 -0.19 -0.88 -0.62  1.08 -1.72 -0.83</span></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a><span class="do">## 206          0.58 -0.08  0.52     0.39 -0.53     0 -0.54  0.54  0.03  0.37</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a><span class="do">## 207         -0.92 -2.82  2.85     4.05 -1.94  0.14 -1.41  1.68  0.79   0.4</span></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a><span class="do">## 208         -0.13 -0.93    -2     -0.5 -0.81 -0.21 -0.92  0.64  0.26  0.02</span></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a><span class="do">##      wpcs  wncs sadh2 saaa2 chaa2 chaa3  achg  rdta n_sp2 n_sp3 o_sp2 o_sp3</span></span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a><span class="do">## 1    0.97 -0.08  0.13 -1.36 -1.52  0.77  0.15   0.7 -0.68 -0.47 -0.83 -0.69</span></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a><span class="do">## 2    0.08  0.07  0.93  1.54  0.05 -0.15  0.39   0.7 -0.68 -0.41  0.09  1.32</span></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a><span class="do">## 3   -0.07 -0.22   0.3 -0.46  0.65  0.31  0.84 -0.57  0.78  0.02 -0.83  0.96</span></span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   -0.38 -0.24  0.36 -0.58  0.11  0.54  0.71 -0.42   0.5  0.03 -0.83  0.21</span></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a><span class="do">## ...   ...   ...   ...   ...   ...   ...   ...   ...   ...   ...   ...   ...</span></span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a><span class="do">## 205 -0.06 -0.59 -1.48 -1.51   0.2  1.81 -1.78 -0.99 -0.68  -0.6 -0.83 -0.69</span></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a><span class="do">## 206  0.07  0.25  0.99   1.2  0.25  0.89  0.78 -0.14 -0.68  0.56  0.74 -0.69</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a><span class="do">## 207  -0.3  0.76   1.8  0.48 -0.31 -0.38  0.11 -0.14 -0.68 -1.08  0.04  0.26</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a><span class="do">## 208 -0.24 -0.85 -1.48 -0.08  0.59 -0.38 -1.78 -0.99  0.76 -0.87  0.34 -0.43</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="线性回归" class="level3" data-number="16.3.1">
+<h3 data-number="16.3.1" class="anchored" data-anchor-id="线性回归"><span class="header-section-number">16.3.1</span> 线性回归</h3>
+<p>接下来演示一个基于线性回归的递归特征消除，数据量少选择自助法比较好，重抽样方法选择也是一门学问，可以参考之前的推文：<a href="https://mp.weixin.qq.com/s/sUioO8DJS8b0ahs8p55AhA">临床预测模型和机器学习中的重抽样问题</a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 加速</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Warning: package 'future' was built under R version 4.2.3</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Attaching package: 'future'</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## The following object is masked from 'package:caret':</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">##     cluster</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="st">"multisession"</span>,<span class="at">workers=</span><span class="dv">8</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置rfe的选项</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>rfeControl <span class="ot">=</span> <span class="fu">rfeControl</span>(<span class="at">functions =</span> lmFuncs,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">method =</span> <span class="st">"cv"</span>, <span class="co"># 默认自助法重采样 boot</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">saveDetails =</span> T, <span class="co"># 保存预测值和变量重要性</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">number =</span> <span class="dv">5</span>, <span class="co"># 重抽样次数</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                        <span class="at">allowParallel =</span> T <span class="co"># 允许多线程，用这个之前你要先准备好多线程！</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                        )</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>定义好之后，下面是正式进行特征选择：</p>
+<p><code>sizes</code>这么理解：这里如果设置为<code>sizes = c(1:71)</code>，意思就是我们要在所有的变量子集中寻找最优的，一共只有71个预测变量，就是要在1,2,3，。。。，71，每一个数量的变量子集都要试一下。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>lmProfile <span class="ot">&lt;-</span> <span class="fu">rfe</span>(x, logBBB,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sizes =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>, <span class="dv">50</span>, <span class="dv">55</span>, <span class="dv">60</span>, <span class="dv">65</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">rfeControl =</span> rfeControl</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                 )</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>运行结束之后，即可查看结果：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看运行结果</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>lmProfile</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Recursive feature selection</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Outer resampling method: Cross-Validated (5 fold) </span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Resampling performance over subset size:</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="do">##  Variables   RMSE Rsquared    MAE  RMSESD RsquaredSD   MAESD Selected</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="do">##          2 0.7820  0.01385 0.6135 0.04318    0.01540 0.04276         </span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="do">##          3 0.7917  0.04226 0.6235 0.04771    0.06134 0.04531         </span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="do">##          4 0.7801  0.06268 0.6101 0.06865    0.09728 0.05553         </span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="do">##          5 0.7495  0.11827 0.5840 0.08888    0.16112 0.06200         </span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="do">##          6 0.7377  0.13665 0.5716 0.08566    0.16106 0.06741         </span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="do">##          7 0.7309  0.15437 0.5700 0.05845    0.08013 0.03619         </span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="do">##          8 0.7153  0.18904 0.5546 0.06004    0.09937 0.02895         </span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="do">##          9 0.6984  0.22469 0.5471 0.07742    0.12875 0.05199         </span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="do">##         10 0.6976  0.22220 0.5511 0.07632    0.12143 0.05549         </span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="do">##         11 0.6694  0.28289 0.5244 0.06061    0.06490 0.03248         </span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="do">##         12 0.6648  0.29297 0.5242 0.05517    0.05391 0.02942         </span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="do">##         13 0.6642  0.29852 0.5250 0.06342    0.07266 0.03543         </span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="do">##         14 0.6531  0.32167 0.5137 0.08665    0.12619 0.05820         </span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="do">##         15 0.6584  0.32371 0.5089 0.08956    0.13920 0.05879         </span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="do">##         16 0.6423  0.35466 0.4944 0.10306    0.15733 0.08299         </span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="do">##         17 0.6532  0.34422 0.5054 0.10736    0.14515 0.08796         </span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="do">##         18 0.6525  0.35123 0.5032 0.11508    0.15685 0.09495         </span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="do">##         19 0.6546  0.34789 0.5007 0.10632    0.14159 0.09047         </span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="do">##         20 0.6341  0.37890 0.4858 0.07458    0.08931 0.06239         </span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="do">##         21 0.6359  0.37810 0.4873 0.07951    0.09254 0.06605         </span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="do">##         22 0.6288  0.39270 0.4838 0.08384    0.09001 0.06214        *</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="do">##         23 0.6313  0.38975 0.4870 0.08167    0.08728 0.06092         </span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="do">##         24 0.6408  0.37938 0.4939 0.07783    0.07434 0.06306         </span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="do">##         25 0.6395  0.37862 0.4920 0.07773    0.07582 0.06751         </span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="do">##         30 0.6983  0.32262 0.5157 0.09891    0.09837 0.07248         </span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="do">##         35 0.7193  0.29867 0.5234 0.10489    0.09395 0.08779         </span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="do">##         40 0.7079  0.33202 0.5195 0.10378    0.09336 0.07573         </span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="do">##         45 0.7518  0.29916 0.5602 0.07306    0.06445 0.05038         </span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="do">##         50 0.7484  0.30170 0.5592 0.07480    0.05449 0.05324         </span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="do">##         55 0.7477  0.31832 0.5532 0.09521    0.08273 0.06976         </span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="do">##         60 0.7661  0.30018 0.5661 0.08239    0.05746 0.06844         </span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="do">##         65 0.7624  0.30845 0.5688 0.08959    0.07645 0.07412         </span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="do">##         71 0.7598  0.30810 0.5658 0.08384    0.07334 0.06893         </span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="do">## The top 5 variables (out of 22):</span></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="do">##    hardness, homo, lumo, pnsa1, fnsa2</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>结果告诉我们很多信息，比如外层循环使用的重抽样方法是<code>Bootstrapped</code>；</p>
+<p>然后给出了不同数量的特征子集的模型表现，<code>Variables</code>这一列是使用的特征数量，可以看到最后有个71特征，明明我们设置的特征数量是<code>sizes = c(2:25, 30, 35, 40, 45, 50, 55, 60, 65)</code>，最多就是65，为啥会有71呢？因为你看上面那个步骤，在最开始都是要用全部特征拟合模型的！</p>
+<p>剩下的几列是模型性能指标，最后一列<code>Selected</code>是选中的模型，有<code>*</code>的就是被选中的，特征数量是22个。此时的RMSE是0.6288，Rsquared是0.39270。</p>
+<p>最后给出了前5个选中的变量。</p>
+<p>通过以下代码查看选中的22个变量是哪些：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看选中的变量</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predictors</span>(lmProfile)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] "hardness"             "homo"                 "lumo"                </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="do">##  [4] "pnsa1"                "fnsa2"                "o_sp2"               </span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="do">##  [7] "fnsa1"                "peoe_vsa.5.1"         "a_base"              </span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [10] "most_positive_charge" "vsa_base"             "rotatablebonds"      </span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [13] "peoe_vsa.6"           "peoe_vsa.6.1"         "rpcg"                </span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="do">## [16] "peoe_vsa.1"           "vsa_other"            "smr_vsa0"            </span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="do">## [19] "ovality"              "rdta"                 "fpsa3"               </span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="do">## [22] "clogp"</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>清楚明白！</p>
+<p>结果也可以使用图形方式查看：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> lmProfile, <span class="at">metric =</span> <span class="st">"RMSE"</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>()</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="feature-selection_rfe_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> lmProfile, <span class="at">metric =</span> <span class="st">"MAE"</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>()</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="feature-selection_rfe_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>查看变量重要性：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">varImp</span>(lmProfile)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="do">##                          Overall</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="do">## hardness             307.2096022</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="do">## homo                 246.7418439</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="do">## lumo                 192.4442402</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="do">## pnsa1                  0.9009845</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="do">## fnsa1                  0.6431244</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## o_sp2                  0.6270888</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="do">## peoe_vsa.5.1           0.5879659</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="do">## fnsa2                  0.5682413</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="do">## most_positive_charge   0.5538182</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="do">## rdta                   0.5436882</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="do">## prx                    0.5390927</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="do">## andrewbind             0.5334340</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="do">## vsa_base               0.5084030</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="do">## peoe_vsa.1             0.5020039</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="do">## rotatablebonds         0.4785500</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="do">## a_base                 0.4717276</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="do">## tcsa                   0.4636548</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="do">## mlogp                  0.4626432</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="do">## peoe_vsa.6.1           0.4526228</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="do">## vsa_other              0.4465362</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="do">## ovality                0.4464361</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="do">## fpsa3                  0.4400715</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="do">## rpcg                   0.4293029</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="do">## peoe_vsa.6             0.4221961</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="do">## smr_vsa0               0.4015024</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="do">## adistd                 0.3485839</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="do">## slogp_vsa5             0.3426358</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="do">## clogp                  0.3399694</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="do">## chaa2                  0.3298837</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="do">## peoe_vsa.4.1           0.3285177</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="do">## peoe_vsa.5             0.3219318</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="do">## wncs                   0.3124847</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="do">## smr_vsa4               0.3119868</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="do">## ub                     0.3096761</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="do">## slogp_vsa9             0.3094456</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="do">## frac.cation7.          0.3013126</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="do">## chaa3                  0.2795578</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="do">## most_negative_charge   0.2775598</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="do">## peoe_vsa.3             0.2765230</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="do">## o_sp3                  0.2750614</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="do">## n_sp2                  0.2535690</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="do">## smr_vsa7               0.2404868</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="do">## n_sp3                  0.2091113</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="do">## peoe_vsa.1.1           0.2014472</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>只看数字不够直观，可以把变量重要性画图展示，方法非常简单：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>varimp_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">feature =</span> <span class="fu">row.names</span>(<span class="fu">varImp</span>(lmProfile))[<span class="dv">1</span><span class="sc">:</span><span class="dv">22</span>],</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">importance =</span> <span class="fu">varImp</span>(lmProfile)[<span class="dv">1</span><span class="sc">:</span><span class="dv">22</span>, <span class="dv">1</span>])</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> varimp_data, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(feature, <span class="sc">-</span>importance), </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">y =</span> importance, <span class="at">fill =</span> feature)) <span class="sc">+</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"identity"</span>) <span class="sc">+</span> </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Features"</span>, <span class="at">y =</span> <span class="st">"Variable Importance"</span>) <span class="sc">+</span> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(importance, <span class="dv">2</span>)), <span class="at">vjust=</span><span class="fl">1.6</span>, <span class="at">color=</span><span class="st">"white"</span>, <span class="at">size=</span><span class="dv">4</span>) <span class="sc">+</span> </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>,<span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="feature-selection_rfe_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>可以看到前3个变量重要性远远超过其他变量！</p>
+<p>如果你在一开始划分了训练集/测试集，那此时你就可以使用这22个选中的变量查看在测试集中的表现了，不过我们一开始并没有划分，所以就用原数据集演示了：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 其实这里应该用测试集</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">postResample</span>(<span class="fu">predict</span>(lmProfile, x), logBBB)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="do">##      RMSE  Rsquared       MAE </span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 0.5016721 0.5836101 0.3834269</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>如果要使用选中的这22变量对新的数据集进行预测，也是非常简单：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 直接使用predict即可</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(lmProfile, <span class="fu">head</span>(x))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="do">##           1           2           3           4           5           6 </span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="do">##  0.22346973 -0.52855194 -0.09119803  0.29685104  0.22498362  0.15485051</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>查看每一次迭代结果：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(lmProfile<span class="sc">$</span>resample)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">##     Variables      RMSE  Rsquared       MAE Resample</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 21         22 0.5682701 0.4369318 0.4686130    Fold1</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 54         22 0.6521735 0.3683946 0.5034888    Fold2</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 87         22 0.6756625 0.3546881 0.5082219    Fold3</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 120        22 0.5198089 0.5205895 0.3861660    Fold4</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 153        22 0.7279476 0.2829001 0.5523393    Fold5</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="随机森林" class="level3" data-number="16.3.2">
+<h3 data-number="16.3.2" class="anchored" data-anchor-id="随机森林"><span class="header-section-number">16.3.2</span> 随机森林</h3>
+<p>再演示一个基于随机森林的递归特征消除。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>rfeControl <span class="ot">=</span> <span class="fu">rfeControl</span>(<span class="at">functions =</span> rfFuncs,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">method =</span> <span class="st">"cv"</span>, </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">number =</span> <span class="dv">5</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                        )</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 加速</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="st">"multisession"</span>,<span class="at">workers=</span><span class="dv">8</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>rfProfile <span class="ot">&lt;-</span> <span class="fu">rfe</span>(x, logBBB,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sizes =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>, <span class="dv">50</span>, <span class="dv">55</span>, <span class="dv">60</span>, <span class="dv">65</span>),</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">rfeControl =</span> rfeControl,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">allowParallel =</span> T</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                 )</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>rfProfile</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Recursive feature selection</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Outer resampling method: Cross-Validated (5 fold) </span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Resampling performance over subset size:</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="do">##  Variables   RMSE Rsquared    MAE  RMSESD RsquaredSD   MAESD Selected</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a><span class="do">##          2 0.6797   0.2699 0.5247 0.09383     0.1240 0.06923         </span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a><span class="do">##          3 0.6339   0.3477 0.4793 0.08518     0.1081 0.06429         </span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a><span class="do">##          4 0.6009   0.4098 0.4559 0.10603     0.1500 0.07971         </span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a><span class="do">##          5 0.5932   0.4258 0.4500 0.09672     0.1344 0.06971         </span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="do">##          6 0.5936   0.4272 0.4425 0.10719     0.1536 0.07327         </span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="do">##          7 0.5922   0.4280 0.4368 0.09625     0.1346 0.06932         </span></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a><span class="do">##          8 0.5821   0.4450 0.4234 0.09817     0.1357 0.07087         </span></span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a><span class="do">##          9 0.5755   0.4584 0.4172 0.08825     0.1173 0.06345         </span></span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a><span class="do">##         10 0.5618   0.4863 0.4091 0.08361     0.1098 0.05929         </span></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a><span class="do">##         11 0.5577   0.4925 0.4067 0.09333     0.1238 0.06680         </span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a><span class="do">##         12 0.5527   0.5015 0.4002 0.09667     0.1282 0.06588         </span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a><span class="do">##         13 0.5446   0.5166 0.3991 0.08919     0.1142 0.06425         </span></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a><span class="do">##         14 0.5388   0.5281 0.3975 0.08202     0.1063 0.05540         </span></span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a><span class="do">##         15 0.5390   0.5296 0.3960 0.08311     0.1046 0.05952         </span></span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a><span class="do">##         16 0.5362   0.5336 0.3921 0.08491     0.1096 0.06068         </span></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a><span class="do">##         17 0.5316   0.5412 0.3910 0.08870     0.1151 0.06519         </span></span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a><span class="do">##         18 0.5349   0.5356 0.3921 0.09198     0.1202 0.06558         </span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a><span class="do">##         19 0.5276   0.5475 0.3868 0.09313     0.1234 0.06696         </span></span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a><span class="do">##         20 0.5271   0.5503 0.3836 0.09376     0.1234 0.06771         </span></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a><span class="do">##         21 0.5293   0.5450 0.3878 0.09410     0.1236 0.06991         </span></span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a><span class="do">##         22 0.5260   0.5528 0.3832 0.09190     0.1200 0.06507         </span></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="do">##         23 0.5289   0.5481 0.3871 0.09107     0.1164 0.06989         </span></span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a><span class="do">##         24 0.5283   0.5463 0.3842 0.09108     0.1188 0.06904         </span></span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a><span class="do">##         25 0.5254   0.5546 0.3848 0.09639     0.1261 0.07094         </span></span>
+<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a><span class="do">##         30 0.5179   0.5689 0.3775 0.09953     0.1277 0.07627        *</span></span>
+<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a><span class="do">##         35 0.5187   0.5711 0.3767 0.08848     0.1146 0.06470         </span></span>
+<span id="cb16-52"><a href="#cb16-52" aria-hidden="true" tabindex="-1"></a><span class="do">##         40 0.5195   0.5680 0.3781 0.09101     0.1125 0.07158         </span></span>
+<span id="cb16-53"><a href="#cb16-53" aria-hidden="true" tabindex="-1"></a><span class="do">##         45 0.5186   0.5709 0.3756 0.09137     0.1168 0.06954         </span></span>
+<span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a><span class="do">##         50 0.5185   0.5727 0.3768 0.09089     0.1140 0.06905         </span></span>
+<span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a><span class="do">##         55 0.5218   0.5694 0.3786 0.08865     0.1155 0.06736         </span></span>
+<span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a><span class="do">##         60 0.5189   0.5733 0.3763 0.08574     0.1062 0.06867         </span></span>
+<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a><span class="do">##         65 0.5218   0.5687 0.3788 0.08603     0.1081 0.06711         </span></span>
+<span id="cb16-58"><a href="#cb16-58" aria-hidden="true" tabindex="-1"></a><span class="do">##         71 0.5219   0.5708 0.3809 0.08333     0.1049 0.06280         </span></span>
+<span id="cb16-59"><a href="#cb16-59" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb16-60"><a href="#cb16-60" aria-hidden="true" tabindex="-1"></a><span class="do">## The top 5 variables (out of 30):</span></span>
+<span id="cb16-61"><a href="#cb16-61" aria-hidden="true" tabindex="-1"></a><span class="do">##    tcsa, fpsa3, tcpa, clogp, most_positive_charge</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>随机森林选出了30个变量，还不如线性回归的效果好。</p>
+</section>
+<section id="支持向量机" class="level3" data-number="16.3.3">
+<h3 data-number="16.3.3" class="anchored" data-anchor-id="支持向量机"><span class="header-section-number">16.3.3</span> 支持向量机</h3>
+<p>再演示一下径向基核函数SVM。</p>
+<p>径向基核函数svm不是预先定义好的算法，所以在进行特征选择时需要在指定<code>rfeControl</code>中指定<code>functions = caretFuncs</code>，然后在<code>rfe</code>中写<code>method = "svmRadial"</code>，其他算法也是类似。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>rfeControl <span class="ot">=</span> <span class="fu">rfeControl</span>(<span class="at">functions =</span> caretFuncs,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">method =</span> <span class="st">"cv"</span>, </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">number =</span> <span class="dv">5</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                        )</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 加速</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(<span class="st">"multisession"</span>,<span class="at">workers=</span><span class="dv">8</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>svmProfile <span class="ot">&lt;-</span> <span class="fu">rfe</span>(x, logBBB,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sizes =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>, <span class="dv">50</span>, <span class="dv">55</span>, <span class="dv">60</span>, <span class="dv">65</span>),</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">method =</span> <span class="st">"svmRadial"</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">rfeControl =</span> rfeControl,</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>                 <span class="at">allowParallel =</span> T</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>                 )</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="多个模型比较" class="level2" data-number="16.4">
+<h2 data-number="16.4" class="anchored" data-anchor-id="多个模型比较"><span class="header-section-number">16.4</span> 多个模型比较</h2>
+<p>以上我们建立了3个模型，可以通过可视化的方法更加直观的比较模型表现：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">xyplot</span>(lmProfile<span class="sc">$</span>results<span class="sc">$</span>RMSE <span class="sc">+</span> rfProfile<span class="sc">$</span>results<span class="sc">$</span>RMSE <span class="sc">+</span> svmProfile<span class="sc">$</span>results<span class="sc">$</span>RMSE <span class="sc">~</span> lmProfile<span class="sc">$</span>results<span class="sc">$</span>Variables,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"features"</span>, <span class="at">ylab =</span> <span class="st">"RMSE"</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">type =</span> <span class="fu">c</span>(<span class="st">"g"</span>,<span class="st">"p"</span>,<span class="st">"l"</span>),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">auto.key =</span> T</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>       )</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="feature-selection_rfe_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>可以选择不同的模型指标画图，这个图用<code>ggplot2</code>画也是很easy，还可以通过分面的形式把多个指标画在一张图里。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>plot.df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">performance =</span> <span class="fu">c</span>(lmProfile<span class="sc">$</span>results<span class="sc">$</span>RMSE,lmProfile<span class="sc">$</span>results<span class="sc">$</span>Rsquared,lmProfile<span class="sc">$</span>results<span class="sc">$</span>MAE,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                  rfProfile<span class="sc">$</span>results<span class="sc">$</span>RMSE,rfProfile<span class="sc">$</span>results<span class="sc">$</span>Rsquared,rfProfile<span class="sc">$</span>results<span class="sc">$</span>MAE,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                  svmProfile<span class="sc">$</span>results<span class="sc">$</span>RMSE,svmProfile<span class="sc">$</span>results<span class="sc">$</span>Rsquared,svmProfile<span class="sc">$</span>results<span class="sc">$</span>MAE</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                  ),</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">rep</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"RMSE"</span>,<span class="st">"Rsquared"</span>,<span class="st">"MAE"</span>),<span class="at">each=</span><span class="fu">length</span>(lmProfile<span class="sc">$</span>results<span class="sc">$</span>Variables)),<span class="dv">3</span>),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="fu">rep</span>(lmProfile<span class="sc">$</span>results<span class="sc">$</span>Variables,<span class="dv">9</span>),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">models =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"linearRegression"</span>,<span class="st">"randomForest"</span>,<span class="st">"rbfsvm"</span>),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">each =</span> <span class="dv">3</span><span class="sc">*</span><span class="fu">length</span>(lmProfile<span class="sc">$</span>results<span class="sc">$</span>Variables))</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(plot.df, <span class="fu">aes</span>(features, performance))<span class="sc">+</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> models, <span class="at">color =</span> models))<span class="sc">+</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> models))<span class="sc">+</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_d</span>()<span class="sc">+</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> metrics, <span class="at">scales =</span> <span class="st">"free_y"</span>)<span class="sc">+</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()<span class="sc">+</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="feature-selection_rfe_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<section id="knn调参" class="level3" data-number="16.4.1">
+<h3 data-number="16.4.1" class="anchored" data-anchor-id="knn调参"><span class="header-section-number">16.4.1</span> knn+调参</h3>
+<p>下面演示一个knn的例子，在进行特征选择时同时可以调参！</p>
+<p>knn不是预先定义好的算法，所以在进行特征选择时需要在指定<code>rfeControl</code>中指定<code>functions = caretFuncs</code>，然后在<code>rfe</code>中写<code>method = "knn"</code>，其他算法也是类似。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlbench)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Warning: package 'mlbench' was built under R version 4.2.3</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(Sonar)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># knn，交叉验证</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>rctrl1 <span class="ot">&lt;-</span> <span class="fu">rfeControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="co"># 交叉验证</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">number =</span> <span class="dv">5</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">returnResamp =</span> <span class="st">"all"</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">functions =</span> caretFuncs,</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">saveDetails =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co"># knn 特征选择，调参</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>knnProfile <span class="ot">&lt;-</span> <span class="fu">rfe</span>(Class <span class="sc">~</span> ., <span class="at">data =</span> Sonar,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">sizes =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>, <span class="dv">50</span>, <span class="dv">55</span>, <span class="dv">60</span>, <span class="dv">65</span>),</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">method =</span> <span class="st">"knn"</span>, <span class="co"># 不要乱写</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="co"># 交叉验证</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">classProbs =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>             <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(<span class="at">k =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>), <span class="co"># 超参数网格</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>             <span class="at">rfeControl =</span> rctrl1)</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>knnProfile</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="do">## Recursive feature selection</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Outer resampling method: Cross-Validated (5 fold) </span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="do">## Resampling performance over subset size:</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="do">##  Variables Accuracy  Kappa AccuracySD KappaSD Selected</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="do">##          2   0.7545 0.5019    0.05878 0.12072         </span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a><span class="do">##          3   0.7645 0.5218    0.04551 0.09357         </span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="do">##          4   0.7692 0.5327    0.06859 0.14152         </span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a><span class="do">##          5   0.7448 0.4809    0.05461 0.11213         </span></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="do">##          6   0.7548 0.5014    0.07020 0.14407         </span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a><span class="do">##          7   0.7595 0.5102    0.08814 0.17986         </span></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="do">##          8   0.7304 0.4521    0.07578 0.15435         </span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a><span class="do">##          9   0.7739 0.5407    0.06294 0.12867         </span></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="do">##         10   0.7547 0.5015    0.06210 0.12747         </span></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="do">##         11   0.7454 0.4823    0.07974 0.16396         </span></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="do">##         12   0.7793 0.5505    0.09630 0.19648         </span></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="do">##         13   0.7551 0.5008    0.09051 0.18883         </span></span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a><span class="do">##         14   0.7837 0.5584    0.09348 0.19819         </span></span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a><span class="do">##         15   0.7790 0.5482    0.08609 0.18333         </span></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a><span class="do">##         16   0.7739 0.5406    0.10119 0.21049         </span></span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a><span class="do">##         17   0.7833 0.5583    0.09512 0.19835         </span></span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a><span class="do">##         18   0.8317 0.6593    0.03395 0.07109         </span></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="do">##         19   0.8220 0.6392    0.03306 0.06930         </span></span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a><span class="do">##         20   0.8509 0.6989    0.04396 0.08925         </span></span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a><span class="do">##         21   0.8124 0.6216    0.08675 0.17529         </span></span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="do">##         22   0.8218 0.6416    0.03800 0.07586         </span></span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a><span class="do">##         23   0.8316 0.6609    0.06694 0.13398         </span></span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a><span class="do">##         24   0.8316 0.6615    0.06189 0.12303         </span></span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a><span class="do">##         25   0.8655 0.7275    0.02668 0.05632         </span></span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a><span class="do">##         30   0.8705 0.7381    0.03906 0.08043        *</span></span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="do">##         35   0.8510 0.6996    0.05532 0.11247         </span></span>
+<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a><span class="do">##         40   0.8700 0.7380    0.05047 0.10232         </span></span>
+<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a><span class="do">##         45   0.8412 0.6772    0.05784 0.12154         </span></span>
+<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="do">##         50   0.8174 0.6299    0.01081 0.02288         </span></span>
+<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="do">##         55   0.8125 0.6203    0.06145 0.12447         </span></span>
+<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a><span class="do">##         60   0.7836 0.5601    0.03849 0.07488         </span></span>
+<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a><span class="do">## The top 5 variables (out of 30):</span></span>
+<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a><span class="do">##    V11, V12, V10, V9, V49</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>查看交叉验证的结果：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>knnProfile<span class="sc">$</span>fit<span class="sc">$</span>results</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="do">##     k  Accuracy     Kappa AccuracySD   KappaSD</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 1   1 0.8454329 0.6892630 0.06862738 0.1364061</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 2   2 0.8418182 0.6795104 0.07044070 0.1431458</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 3   3 0.8318398 0.6609428 0.07523813 0.1510544</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   4 0.8513636 0.7000060 0.06529929 0.1318002</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 5   5 0.8227706 0.6409301 0.06975862 0.1423341</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 6   6 0.7944156 0.5854349 0.07880035 0.1605779</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 7   7 0.7741991 0.5428163 0.08134842 0.1658695</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 8   8 0.7794372 0.5525427 0.07050749 0.1429124</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 9   9 0.7982684 0.5898521 0.07648364 0.1573860</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 10 10 0.7989610 0.5914536 0.09913461 0.2043514</span></span></code><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>以上就是caret中使用递归特征消除的演示，更多细节大家自己探索。递归特征消除的方法非常多，大家不要天天只知道用支持向量机！</p>
+<p>另外，在使用时可能会遇到一些问题，毕竟是一个很老的包了……比如，x和y长度不相等问题…网上答案一搜一大堆，大家遇到了百度下即可。</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "已复制");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "已复制");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./feature-selection_filter.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">单变量过滤法</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./clinmodel-evalution.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">R语言实战临床预测模型 was written by 阿越.</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">本书由 <a href="https://quarto.org/">Quarto</a> 强力驱动.</div>
+  </div>
+</footer>
+
+
+
+</body></html>
