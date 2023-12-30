@@ -1,103 +1,223 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://ayue2019.gitee.io/model-compare_tidymodels.html</loc>
-    <lastmod>2023-10-15T05:11:16.371Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/index.html</loc>
+    <lastmod>2023-12-26T01:56:39.079Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/model-compare_workflow.html</loc>
-    <lastmod>2023-10-15T05:11:14.429Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/clinmodel-definition.html</loc>
+    <lastmod>2023-12-26T01:58:04.554Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/model-compare_mlr3.html</loc>
-    <lastmod>2023-10-15T05:11:14.445Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nomogram-logistic.html</loc>
+    <lastmod>2023-12-25T12:57:57.057Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/model-compare_caret.html</loc>
-    <lastmod>2023-10-15T06:09:10.843Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nomogram-cox.html</loc>
+    <lastmod>2023-12-25T12:57:57.072Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/data-preprocess.html</loc>
-    <lastmod>2023-10-15T05:11:14.502Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nomogram-essential.html</loc>
+    <lastmod>2023-12-25T12:57:57.086Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/data-split.html</loc>
-    <lastmod>2023-10-15T05:11:14.510Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nomogram-rcs.html</loc>
+    <lastmod>2023-12-25T12:57:57.099Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/9999-appendix.html</loc>
-    <lastmod>2023-10-15T05:11:14.518Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nomogram-compete-risk.html</loc>
+    <lastmod>2023-12-25T12:57:57.122Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/index.html</loc>
-    <lastmod>2023-10-15T06:12:29.909Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nomogram-lasso.html</loc>
+    <lastmod>2023-12-25T12:57:57.128Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/feature-selection_stepwise.html</loc>
-    <lastmod>2023-10-15T05:28:27.719Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nomogram-colorfulbar.html</loc>
+    <lastmod>2023-12-25T12:57:57.147Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/feature-selection_randomforest.html</loc>
-    <lastmod>2023-10-15T05:28:27.737Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nomogram-points.html</loc>
+    <lastmod>2023-12-25T12:58:18.881Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/feature-selection_rfe.html</loc>
-    <lastmod>2023-10-15T05:28:27.776Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/feature-selection.html</loc>
+    <lastmod>2023-12-25T12:57:57.167Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/dca-cox.html</loc>
-    <lastmod>2023-10-15T06:08:27.220Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/feature-selection_unimulti.html</loc>
+    <lastmod>2023-12-25T12:57:57.183Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/dca-diy.html</loc>
-    <lastmod>2023-10-15T06:08:58.661Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/feature-selection_stepwise.html</loc>
+    <lastmod>2023-12-25T12:57:57.219Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/clinmodel-definition.html</loc>
-    <lastmod>2023-10-15T05:29:54.356Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/feature-selection_bestsubset.html</loc>
+    <lastmod>2023-12-25T12:57:57.236Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/nomogram-logistic.html</loc>
-    <lastmod>2023-10-15T05:30:03.643Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/feature-selection_lasso.html</loc>
+    <lastmod>2023-12-25T12:57:57.291Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/nomogram-cox.html</loc>
-    <lastmod>2023-10-15T05:30:25.460Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/feature-selection_randomforest.html</loc>
+    <lastmod>2023-12-25T12:57:57.306Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/nomogram-rcs.html</loc>
-    <lastmod>2023-10-15T05:30:37.337Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/clinmodel-evalution.html</loc>
+    <lastmod>2023-12-25T12:57:57.316Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/nomogram-compete-risk.html</loc>
-    <lastmod>2023-10-15T05:30:46.291Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/roc-binominal.html</loc>
+    <lastmod>2023-12-26T01:55:36.931Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/calibration-qhscrnomo.html</loc>
-    <lastmod>2023-10-15T06:12:31.302Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/roc-survive.html</loc>
+    <lastmod>2023-12-25T12:57:57.347Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/dca-logistic.html</loc>
-    <lastmod>2023-10-15T06:07:46.444Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/roc-bestcut.html</loc>
+    <lastmod>2023-12-26T01:55:36.933Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/cindex-compare.html</loc>
-    <lastmod>2023-10-15T06:06:37.875Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/roc-smooth.html</loc>
+    <lastmod>2023-12-26T01:55:45.522Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/roc-compare.html</loc>
-    <lastmod>2023-10-15T06:05:47.614Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/roc-compare.html</loc>
+    <lastmod>2023-12-25T12:57:57.395Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/cindex.html</loc>
-    <lastmod>2023-10-15T06:05:46.102Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/roc-attention.html</loc>
+    <lastmod>2023-12-25T12:57:57.410Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/feature-selection_unimulti.html</loc>
-    <lastmod>2023-10-15T06:06:51.058Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/roc-many.html</loc>
+    <lastmod>2023-12-25T12:57:57.418Z</lastmod>
   </url>
   <url>
-    <loc>https://ayue2019.gitee.io/feature-selection_filter.html</loc>
-    <lastmod>2023-10-15T06:12:29.918Z</lastmod>
+    <loc>https://https://ayueme.github.io/R_clinical_model/roc-bootstrap.html</loc>
+    <lastmod>2023-12-25T12:57:57.439Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/多分类数据的ROC曲线.html</loc>
+    <lastmod>2023-12-25T12:57:57.456Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/cindex.html</loc>
+    <lastmod>2023-12-25T12:57:57.472Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/cindex-compare.html</loc>
+    <lastmod>2023-12-25T12:57:57.485Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/conf_matrix-3d.html</loc>
+    <lastmod>2023-12-25T12:57:57.494Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/nri.html</loc>
+    <lastmod>2023-12-25T12:57:57.522Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/idi.html</loc>
+    <lastmod>2023-12-25T12:57:57.534Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-logistic.html</loc>
+    <lastmod>2023-12-25T12:57:57.567Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-logistic-test.html</loc>
+    <lastmod>2023-12-25T12:57:57.582Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-cox.html</loc>
+    <lastmod>2023-12-25T12:57:57.603Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-cox-test.html</loc>
+    <lastmod>2023-12-25T12:57:57.625Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-tidymodels-man.html</loc>
+    <lastmod>2023-12-25T12:57:57.640Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-tidymodels.html</loc>
+    <lastmod>2023-12-25T12:57:57.649Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-mlr3.html</loc>
+    <lastmod>2023-12-25T12:57:57.669Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-qhscrnomo.html</loc>
+    <lastmod>2023-12-25T12:57:57.684Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/calibration-lasso.html</loc>
+    <lastmod>2023-12-25T12:57:57.710Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/dca-logistic.html</loc>
+    <lastmod>2023-12-25T12:57:57.736Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/dca-cox.html</loc>
+    <lastmod>2023-12-25T12:57:57.756Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/dca-diy.html</loc>
+    <lastmod>2023-12-25T12:57:57.781Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/DCA彩色条带.html</loc>
+    <lastmod>2023-12-25T13:00:16.389Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/DCA测试集.html</loc>
+    <lastmod>2023-12-25T12:59:52.235Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/校准曲线和决策曲线的概率.html</loc>
+    <lastmod>2023-12-25T12:58:30.167Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/model-compare_tidymodels.html</loc>
+    <lastmod>2023-12-25T12:57:57.878Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/model-compare_workflow.html</loc>
+    <lastmod>2023-12-25T12:57:57.897Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/model-compare_mlr3.html</loc>
+    <lastmod>2023-12-25T12:57:57.911Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/model-compare_caret.html</loc>
+    <lastmod>2023-12-25T12:57:57.934Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/data-preprocess.html</loc>
+    <lastmod>2023-12-25T12:57:57.964Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/data-split.html</loc>
+    <lastmod>2023-12-25T12:57:57.974Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/9999-appendix.html</loc>
+    <lastmod>2023-12-25T12:57:57.981Z</lastmod>
+  </url>
+  <url>
+    <loc>https://https://ayueme.github.io/R_clinical_model/R语言实战临床预测模型.pdf</loc>
+    <lastmod>2023-12-25T12:57:56.648Z</lastmod>
+  </url>
+  <url>
+    <loc>https://ayueme.github.io/R_clinical_model/index.html</loc>
+    <lastmod>2023-12-30T02:26:38.363Z</lastmod>
   </url>
 </urlset>

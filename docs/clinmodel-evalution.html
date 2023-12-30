@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>R语言实战临床预测模型 - 17&nbsp; 临床预测模型的评价方法</title>
+<title>R语言实战临床预测模型 - 16&nbsp; 临床预测模型的评价方法</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./roc-binominal.html" rel="next">
-<link href="./feature-selection_rfe.html" rel="prev">
+<link href="./feature-selection_randomforest.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -73,7 +73,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./clinmodel-evalution.html">模型评价</a></li><li class="breadcrumb-item"><a href="./clinmodel-evalution.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./clinmodel-evalution.html">模型评价</a></li><li class="breadcrumb-item"><a href="./clinmodel-evalution.html"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -90,7 +90,7 @@ ul.task-list li input[type="checkbox"] {
     <div class="sidebar-title mb-0 py-0">
       <a href="./">R语言实战临床预测模型</a> 
         <div class="sidebar-tools-main">
-    <a href="https://gitee.com/ayue2019/ayue2019/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-git"></i></a>
+    <a href="https://https://github.com/ayueme/R_clinical_model" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
@@ -136,40 +136,51 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./nomogram-essential.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">列线图的本质</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./nomogram-rcs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">样条回归列线图绘制</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">样条回归列线图绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nomogram-compete-risk.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">竞争风险模型列线图绘制</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">竞争风险模型列线图绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nomogram-essential.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">列线图的本质</span></span></a>
+  <a href="./nomogram-lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">lasso回归列线图绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nomogram-colorfulbar.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">列线图添加彩色风险分层</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">列线图添加彩色风险分层</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nomogram-points.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">列线图计算得分及危险分层</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">计算列线图得分及危险分层</span></span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./lasso.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">lasso回归筛选变量</span></span></a>
-  </div>
-</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">变量筛选</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./feature-selection.html" class="sidebar-item-text sidebar-link">
@@ -178,14 +189,14 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./feature-selection_stepwise.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">筛选变量逐步回归</span></span></a>
+  <a href="./feature-selection_unimulti.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">变量筛选之先单后多</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./feature-selection_unimulti.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">变量筛选之先单后多</span></span></a>
+  <a href="./feature-selection_stepwise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">筛选变量逐步回归</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -196,55 +207,55 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./feature-selection_lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">lasso回归筛选变量</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./feature-selection_randomforest.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">变量筛选之随机森林</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./feature-selection_filter.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">单变量过滤法</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./feature-selection_rfe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">递归特征消除</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">变量筛选之随机森林</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
  <span class="menu-text">模型评价</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="切換部分">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="切換部分">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./clinmodel-evalution.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./roc-binominal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">二分类资料ROC曲线绘制</span></span></a>
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">二分类资料ROC曲线绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./roc-survive.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">生存资料ROC曲线绘制</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">生存资料ROC曲线绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./roc-bestcut-smooth.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">ROC曲线的最佳截点和平滑曲线</span></span></a>
+  <a href="./roc-bestcut.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">ROC曲线的最佳截点</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-smooth.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">平滑ROC曲线</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -255,26 +266,26 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./roc-two.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">ROC的两面性</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./roc-ggplot.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">ROC曲线ggplot2绘制</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./roc-attention.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">R语言计算AUC(ROC)注意事项</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">R语言计算AUC(ROC)注意事项</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./roc-many.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">多指标联合诊断的ROC曲线</span></span></a>
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">多指标联合诊断的ROC曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">bootstrap ROC/AUC</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./多分类数据的ROC曲线.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">多分类数据的ROC曲线</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -357,55 +368,44 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./calibration-lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">39</span>&nbsp; <span class="chapter-title">lasso回归列线图、校准曲线、内外部验证</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./dca-logistic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">39</span>&nbsp; <span class="chapter-title">分类数据的决策曲线分析</span></span></a>
+ <span class="menu-text"><span class="chapter-number">40</span>&nbsp; <span class="chapter-title">分类数据的决策曲线分析</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./dca-cox.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">40</span>&nbsp; <span class="chapter-title">生存数据的决策曲线分析</span></span></a>
+ <span class="menu-text"><span class="chapter-number">41</span>&nbsp; <span class="chapter-title">生存数据的决策曲线分析</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./dca-diy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">41</span>&nbsp; <span class="chapter-title">适用于一切模型的决策曲线分析</span></span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
- <span class="menu-text">模型比较</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="切換部分">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./model-compare_tidymodels.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">42</span>&nbsp; <span class="chapter-title">tidymodels实现多模型比较</span></span></a>
+ <span class="menu-text"><span class="chapter-number">42</span>&nbsp; <span class="chapter-title">适用于一切模型的决策曲线分析</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./model-compare_workflow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">43</span>&nbsp; <span class="chapter-title">workflow实现多模型比较</span></span></a>
+  <a href="./DCA彩色条带.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">43</span>&nbsp; <span class="chapter-title">决策曲线添加彩色条带</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./model-compare_mlr3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">44</span>&nbsp; <span class="chapter-title">mlr3实现多模型比较</span></span></a>
+  <a href="./DCA测试集.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">44</span>&nbsp; <span class="chapter-title">测试集的决策曲线分析</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./model-compare_caret.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">45</span>&nbsp; <span class="chapter-title">caret实现多模型比较</span></span></a>
+  <a href="./校准曲线和决策曲线的概率.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">45</span>&nbsp; <span class="chapter-title">校准曲线和决策曲线的概率</span></span></a>
   </div>
 </li>
       </ul>
@@ -413,12 +413,47 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
- <span class="menu-text">附录</span></a>
+ <span class="menu-text">模型比较</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="切換部分">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_tidymodels.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">46</span>&nbsp; <span class="chapter-title">tidymodels实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">47</span>&nbsp; <span class="chapter-title">workflow实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_mlr3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">48</span>&nbsp; <span class="chapter-title">mlr3实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_caret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">49</span>&nbsp; <span class="chapter-title">caret实现多模型比较</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text">附录</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./data-preprocess.html" class="sidebar-item-text sidebar-link">
@@ -434,7 +469,7 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./9999-appendix.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">软件安装及其他合集</span></span></a>
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">其他合集</span></span></a>
   </div>
 </li>
       </ul>
@@ -449,25 +484,25 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">目录</h2>
    
   <ul>
-  <li><a href="#什么样的模型是好的模型" id="toc-什么样的模型是好的模型" class="nav-link active" data-scroll-target="#什么样的模型是好的模型"><span class="header-section-number">17.1</span> 什么样的模型是好的模型？</a></li>
-  <li><a href="#区分度的评价" id="toc-区分度的评价" class="nav-link" data-scroll-target="#区分度的评价"><span class="header-section-number">17.2</span> 区分度的评价</a></li>
-  <li><a href="#校准度的评价" id="toc-校准度的评价" class="nav-link" data-scroll-target="#校准度的评价"><span class="header-section-number">17.3</span> 校准度的评价</a></li>
-  <li><a href="#多个模型之间的比较" id="toc-多个模型之间的比较" class="nav-link" data-scroll-target="#多个模型之间的比较"><span class="header-section-number">17.4</span> 多个模型之间的比较</a>
+  <li><a href="#什么样的模型是好的模型" id="toc-什么样的模型是好的模型" class="nav-link active" data-scroll-target="#什么样的模型是好的模型"><span class="header-section-number">16.1</span> 什么样的模型是好的模型？</a></li>
+  <li><a href="#区分度的评价" id="toc-区分度的评价" class="nav-link" data-scroll-target="#区分度的评价"><span class="header-section-number">16.2</span> 区分度的评价</a></li>
+  <li><a href="#校准度的评价" id="toc-校准度的评价" class="nav-link" data-scroll-target="#校准度的评价"><span class="header-section-number">16.3</span> 校准度的评价</a></li>
+  <li><a href="#多个模型之间的比较" id="toc-多个模型之间的比较" class="nav-link" data-scroll-target="#多个模型之间的比较"><span class="header-section-number">16.4</span> 多个模型之间的比较</a>
   <ul class="collapse">
-  <li><a href="#nri" id="toc-nri" class="nav-link" data-scroll-target="#nri"><span class="header-section-number">17.4.1</span> NRI</a></li>
-  <li><a href="#idi" id="toc-idi" class="nav-link" data-scroll-target="#idi"><span class="header-section-number">17.4.2</span> IDI</a></li>
+  <li><a href="#nri" id="toc-nri" class="nav-link" data-scroll-target="#nri"><span class="header-section-number">16.4.1</span> NRI</a></li>
+  <li><a href="#idi" id="toc-idi" class="nav-link" data-scroll-target="#idi"><span class="header-section-number">16.4.2</span> IDI</a></li>
   </ul></li>
-  <li><a href="#决策曲线-dca" id="toc-决策曲线-dca" class="nav-link" data-scroll-target="#决策曲线-dca"><span class="header-section-number">17.5</span> 决策曲线 DCA</a></li>
-  <li><a href="#临床影响曲线-cic" id="toc-临床影响曲线-cic" class="nav-link" data-scroll-target="#临床影响曲线-cic"><span class="header-section-number">17.6</span> 临床影响曲线 CIC</a></li>
+  <li><a href="#决策曲线-dca" id="toc-决策曲线-dca" class="nav-link" data-scroll-target="#决策曲线-dca"><span class="header-section-number">16.5</span> 决策曲线 DCA</a></li>
+  <li><a href="#临床影响曲线-cic" id="toc-临床影响曲线-cic" class="nav-link" data-scroll-target="#临床影响曲线-cic"><span class="header-section-number">16.6</span> 临床影响曲线 CIC</a></li>
   </ul>
-</nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://https://github.com/ayueme/R_clinical_model/issues/new" class="toc-action">报告问题</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></h1>
+<h1 class="title"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></h1>
 </div>
 
 
@@ -488,8 +523,8 @@ ul.task-list li input[type="checkbox"] {
 <p>这一篇主要就是讲这些，其实就是一些概念的理解，但不理解也问题不大，只要你会计算，会画图，写文章时把这些指标都写上就够了！</p>
 <p>目前模型评价的主要内容都是来自于2017年发表于<strong>JAMA上面的一篇文章：<a href="https://pubmed.ncbi.nlm.nih.gov/29049590/">Discrimination and Calibration of Clinical Prediction Models: Users’ Guides to the Medical Literature</a></strong>。</p>
 <p>这篇文章详细介绍了模型评价的主要内容以及各个指标的含义及临床意义，非常推荐感兴趣的小伙伴去阅读原文。</p>
-<section id="什么样的模型是好的模型" class="level2" data-number="17.1">
-<h2 data-number="17.1" class="anchored" data-anchor-id="什么样的模型是好的模型"><span class="header-section-number">17.1</span> 什么样的模型是好的模型？</h2>
+<section id="什么样的模型是好的模型" class="level2" data-number="16.1">
+<h2 data-number="16.1" class="anchored" data-anchor-id="什么样的模型是好的模型"><span class="header-section-number">16.1</span> 什么样的模型是好的模型？</h2>
 <p>一个理想的模型应该是这样的：它能正确区分所有的患者和非患者，能正确预测每一个个体是否会发生危险事件，并且不会出错。很明显这样的模型是不存在的，我们只能朝这个方向努力。</p>
 <p>评价一个模型的好坏可以从<strong>区分度（Discrimination）和校准度（Calibration）</strong>两个方面进行。</p>
 <p><strong>区分度</strong>指的是一个模型能正确把人群分为患者/非患者，或者正确区分个体是处于低风险、还是处于高风险，或者正确预测患者是存活、还是死亡等的能力。</p>
@@ -498,8 +533,8 @@ ul.task-list li input[type="checkbox"] {
 <p>一个具有良好区分度的模型，校准度不一定也很好。比如，一个模型把A、B两个患者（实际上就是低风险）都分为低风险组，并且B的风险是A的3倍，我们可以说这个模型的区分度很好，因为分类分的很准！然后这个模型预测出A的风险是1%，B的风险是3%，但实际上A的风险是10%，B的风险是30%！你看，这个模型的校准度就很差（世纪概率和预测概率相差很大）。如果使用这样的模型预测出来的结果处理病人的话，可能就会碰到很多问题。</p>
 <p>区分度和校准度虽然都有不足，但是一般来说，具有较差区分度的模型，其校准度也不会很好。当一个模型区分度和校准度都很差的时候，我们可以先从提高模型区分度的角度继续。</p>
 </section>
-<section id="区分度的评价" class="level2" data-number="17.2">
-<h2 data-number="17.2" class="anchored" data-anchor-id="区分度的评价"><span class="header-section-number">17.2</span> 区分度的评价</h2>
+<section id="区分度的评价" class="level2" data-number="16.2">
+<h2 data-number="16.2" class="anchored" data-anchor-id="区分度的评价"><span class="header-section-number">16.2</span> 区分度的评价</h2>
 <p>说了这么多，那我们应该用哪些指标评价模型的分类能力的强弱呢？</p>
 <p>我们可以使用<strong>ROC曲线和C-Statistic</strong>评价。二分类变量的AUC（曲线下面积）和C-Statistic是一个东西，都是越接近1，模型的区分度越好。<strong>一般认为，AUC或者C-Statistic在0.6以下是低区分度，在0.6~0.75之间是中区分度，高于0.75是高区分度</strong>。</p>
 <p>关于ROC曲线和AUC的概念，大家自行了解。</p>
@@ -507,8 +542,8 @@ ul.task-list li input[type="checkbox"] {
 <p>ROC曲线的横坐标是1-特异度，纵坐标是灵敏度，也就是横坐标是假阳性，纵坐标是真阳性，这两个指标刚好是相反的，一个大另一个就小，所以一般我们会找<strong>一个阈值</strong>，使得曲线下面积最大。但是如果考虑到临床，这样做有时也是不妥的。比如，在患者具有某些高危疾病（比如心梗、肺梗等）的风险时，我们应该采取更加激进的措施进行预防，这时我们就需要更高的灵敏度，因为不想漏诊。</p>
 <p>ROC和C-Statistic也存在明显的局限性，比如在模型中新增一个预测变量可能对于预后非常重要，但是反应在ROC和C-Statistic上却变化不大，特别是在ROC和C-Statistic已经很高的时候。</p>
 </section>
-<section id="校准度的评价" class="level2" data-number="17.3">
-<h2 data-number="17.3" class="anchored" data-anchor-id="校准度的评价"><span class="header-section-number">17.3</span> 校准度的评价</h2>
+<section id="校准度的评价" class="level2" data-number="16.3">
+<h2 data-number="16.3" class="anchored" data-anchor-id="校准度的评价"><span class="header-section-number">16.3</span> 校准度的评价</h2>
 <p>目前校准度的评价最好的方式还是使用<strong>Calibration curve(Calibration plot)</strong>。通过校准曲线可以非常直观地看到预测概率和真实概率的关系。</p>
 <p><img src="figs/Snipaste_2023-04-01_18-00-26.png" class="img-fluid"></p>
 <p>校准度的评价可以在很多水平进行，比如，从整体角度，或者从不同的组进行等。</p>
@@ -516,12 +551,12 @@ ul.task-list li input[type="checkbox"] {
 <p>假如把100个人按照预测概率大小排好序，然后分成10组，每组10人，在每个组内计算模型平均概率，再和真实概率（比如一组内10人有3人发生了结局事件，那这一组的真实概率就是30%）比较，然后把真实概率作为横坐标，预测概率作为纵坐标，就可以画出Calibration curve了，这就是从不同组的角度评价的（这是目前多数做法）。</p>
 <p>校准度还可以用<strong>Hosmer-Lemeshow 检验（H-L 检验）</strong>进行检验，若得到的P值小于0.05，那说明模型的预测值和真实值之间有差异，实际上Calibration curve就是Hosmer-Lemeshow检验的结果可视化，但是也仅仅是能说明有差异而已，并不能量化差异的大小。</p>
 </section>
-<section id="多个模型之间的比较" class="level2" data-number="17.4">
-<h2 data-number="17.4" class="anchored" data-anchor-id="多个模型之间的比较"><span class="header-section-number">17.4</span> 多个模型之间的比较</h2>
+<section id="多个模型之间的比较" class="level2" data-number="16.4">
+<h2 data-number="16.4" class="anchored" data-anchor-id="多个模型之间的比较"><span class="header-section-number">16.4</span> 多个模型之间的比较</h2>
 <p>模型之间的区分度可以用<strong>AUC或者C-Statistic</strong>进行比较，校准度可以用<strong>AIC（Akaike index criterion）、BIC（Bayesian index criterion）、R^2</strong>等指标进行比较。</p>
 <p>除此之外，还可以用<strong>净重新分类指数</strong>和<strong>综合判别改善指数</strong>来比较模型的优劣。</p>
-<section id="nri" class="level3" data-number="17.4.1">
-<h3 data-number="17.4.1" class="anchored" data-anchor-id="nri"><span class="header-section-number">17.4.1</span> NRI</h3>
+<section id="nri" class="level3" data-number="16.4.1">
+<h3 data-number="16.4.1" class="anchored" data-anchor-id="nri"><span class="header-section-number">16.4.1</span> NRI</h3>
 <p><strong>NRI，net reclassification index，净重新分类指数</strong>，是用来比较模型准确度的，这个概念有点难理解，但是非常重要，在临床研究中非常常见，是评价模型的一大利器！</p>
 <p>我们可以这样简单的理解，假如有一群受试者，有些是患病的，有些是没病的，你建立了一个模型1，通过计算把受试者分为了有病组和没病组（当然有些是分错的），然后你又建立了模型2，也是把这群受试者分成了有病组和没病组，相当于是重新分类了！2个模型计算的结果是不一样的，有的可能重新分类分对了，有的可能分错了，然后，<strong>净重分类 = 重新分对的 - 重新分错的</strong>，净重分类指数只要再除以总人数就可以了，这样得到的就是<strong>绝对净重分类指数</strong>。</p>
 <p><strong>绝对净重分类指数</strong>反应的是模型对整体的分类能力有无改变，但是，对于有病组和没病组，都是有可能出现重新分类分对了/重新分类分错了/重新分类和之前一样，这3种情况的。所以，我们完全可以把有病组和没病组分开计算净重分类指数，然后再相加，这样得到的就是<strong>相加净重分类指数</strong>（additive NRI）。</p>
@@ -531,8 +566,8 @@ ul.task-list li input[type="checkbox"] {
 <p>根据这个表计算出来的<strong>相加NRI为11%，但是绝对NRI为-8%</strong>。绝对NRI为-8%说明新模型比旧模型差，难道我们就要继续采用旧模型了吗？但是我们的结局事件是心梗，是会危及患者生命的，这时候我们就需要适当提高假阳性，因为即使漏诊1例对漏诊的患者来说也是生命攸关的大事，所以这种情况下新模型还是值得采用的。</p>
 <p>所以到底怎么取舍，不能只看数字，一定要结合实际情况，写文章时遇到了不好的结果也要好好讨论！</p>
 </section>
-<section id="idi" class="level3" data-number="17.4.2">
-<h3 data-number="17.4.2" class="anchored" data-anchor-id="idi"><span class="header-section-number">17.4.2</span> IDI</h3>
+<section id="idi" class="level3" data-number="16.4.2">
+<h3 data-number="16.4.2" class="anchored" data-anchor-id="idi"><span class="header-section-number">16.4.2</span> IDI</h3>
 <p>NRI、AUC、C-Statistic都是要先设置一个阈值，然后在这个阈值的前提下进行各种比较，它们只是考虑了单独一个点的情况，不能反应模型的整体情况。因此，又来了新的指标-<strong>IDI，Integrated Discrimination Improvement，综合判别改善指数</strong>。</p>
 <p>IDI的计算很简单，它反映了两个模型在预测概率上的差别，是基于模型对每个个体的预测概率计算所得。它的计算方法为：</p>
 <p><img src="figs/Snipaste_2023-04-01_18-03-30.png" class="img-fluid"></p>
@@ -545,8 +580,8 @@ ul.task-list li input[type="checkbox"] {
 <p>两部分再相减，就是值越大，表明模型预测能力越好，如果IDI为负值，那说明还不如原来的模型好。</p>
 </section>
 </section>
-<section id="决策曲线-dca" class="level2" data-number="17.5">
-<h2 data-number="17.5" class="anchored" data-anchor-id="决策曲线-dca"><span class="header-section-number">17.5</span> 决策曲线 DCA</h2>
+<section id="决策曲线-dca" class="level2" data-number="16.5">
+<h2 data-number="16.5" class="anchored" data-anchor-id="决策曲线-dca"><span class="header-section-number">16.5</span> 决策曲线 DCA</h2>
 <p>临床都会碰到假阳性和假阴性问题，也就是误诊和漏诊问题，对于不同的疾病，可能我们需要的阈值不同，有时需要更高的假阳性，有时需要更高的假阴性，因此这就是一个实际临床效用问题，到底怎么办，才能使患者获益最大？</p>
 <p><strong>决策曲线分析（Decision Curve Analysis，DCA）</strong>就是为了解决这一问题。</p>
 <p>当患者有症状但尚不能诊断为某种疾病时，临床医生必须决定是(1)经验性治疗，(2)不治疗，或(3)在选择选项1和2之前进行进一步的检查。是否治疗取决于临床医生的经验、疾病治疗的有效性和并发症，以及患者接受治疗风险和负担的意愿。决策曲线分析是一种通过考虑患者风险和获益的可能范围来评估临床决策是否可行的方法。</p>
@@ -556,8 +591,8 @@ ul.task-list li input[type="checkbox"] {
 <p>上图中还有2条特殊的线，一条水平的蓝色线，表示<strong>所有人都不接受治疗</strong>时，此时不管概率阈值是多少，净获益肯定都是0。一条黄色的线，表示<strong>所有人都接受治疗</strong>时，随着概率阈值的改变，其净获益的改变。这两条线代表了2种极端的情况。</p>
 <p>在给定的概率阈值下，肯定是净获益越大越好，所以一般来说，肯定是曲线距离两条特殊的线越远越好。</p>
 </section>
-<section id="临床影响曲线-cic" class="level2" data-number="17.6">
-<h2 data-number="17.6" class="anchored" data-anchor-id="临床影响曲线-cic"><span class="header-section-number">17.6</span> 临床影响曲线 CIC</h2>
+<section id="临床影响曲线-cic" class="level2" data-number="16.6">
+<h2 data-number="16.6" class="anchored" data-anchor-id="临床影响曲线-cic"><span class="header-section-number">16.6</span> 临床影响曲线 CIC</h2>
 <p>临床影响曲线，Clinical Impact Curve，属于DCA的变种，是Kerr等人对DCA的进一步发展，结合下面这张图来看：</p>
 <p><img src="figs/Snipaste_2023-04-01_18-04-49.png" class="img-fluid"></p>
 <p>横坐标还是概率阈值，纵坐标是人数。紫色线表示在不同的概率阈值下，被模型判定为高风险的人数；红色线条表示在不同的概率阈值下，被模型判定为高风险且真的发生结局事件的人数。在最下面还增加了一个<strong>损失：获益比</strong>，表示在不同的概率阈值下，损失和获益的比例。</p>
@@ -802,13 +837,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./feature-selection_rfe.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">递归特征消除</span></span>
+      <a href="./feature-selection_randomforest.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">变量筛选之随机森林</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./roc-binominal.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">二分类资料ROC曲线绘制</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">二分类资料ROC曲线绘制</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

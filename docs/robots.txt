@@ -1,1 +1,1 @@
-Sitemap: https://ayue2019.gitee.io/sitemap.xml
+Sitemap: https://ayueme.github.io/R_clinical_model/sitemap.xml
