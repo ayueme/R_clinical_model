@@ -1,4 +1,7 @@
 # R语言实战临床预测模型
+
+> 本书在线观看地址：https://ayueme.github.io/R_clinical_model/
+
 - 谨以此书献给我不务正业的研究生生涯。
 
   ## 本书缘起
