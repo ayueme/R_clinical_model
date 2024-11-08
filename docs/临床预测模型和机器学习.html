@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.15">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; 临床预测模型和机器学习 – R语言实战临床预测模型</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./文献学习.html" rel="next">
+<link href="./临床预测模型建立的一般步骤.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-018089954d508eae8a473f0b7f0491f0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-22b4451ef2a64dd3346f18820cc52094.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./临床预测模型概念.html">基础知识</a></li><li class="breadcrumb-item"><a href="./临床预测模型和机器学习.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">临床预测模型和机器学习</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜索" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R语言实战临床预测模型</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/ayueme/R_clinical_model/" title="源代码" class="quarto-navigation-tool px-1" aria-label="源代码"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜索"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">前言</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">基础知识</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./临床预测模型概念.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">什么是临床预测模型？</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./临床预测模型建立的一般步骤.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">临床预测模型建立的一般步骤</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./临床预测模型和机器学习.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">临床预测模型和机器学习</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./文献学习.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">文献学习</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./模型建立和可视化.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">模型建立和可视化</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data-split.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data-preprocess.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">常见的数据预处理方法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">逻辑回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Cox回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-原理.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">列线图的本质</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-rcs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">样条回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-compete-risk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">竞争风险模型列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">lasso回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-colorfulbar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">列线图添加彩色风险分层</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-points.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">计算列线图得分及危险分层</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./feature-selection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">常见的变量选择方法</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_unimulti.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">变量选择之先单后多</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_stepwise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">变量选择之逐步回归</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_bestsubset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">变量选择之最优子集</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">lasso回归筛选变量</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_randomforest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">随机森林筛选变量</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./临床预测模型评价.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">临床预测模型的评价</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./conf_matrix-3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">三维混淆矩阵</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-binominal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">二分类ROC曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-survive.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">生存数据ROC曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">ROC曲线的显著性检验</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">bootstrap ROC/AUC</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">C-index的计算</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cindex-compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">C-index的比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nri.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">净重分类指数NRI</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./idi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">综合判别改善指数IDI</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">分类模型校准曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./hosmer-lemeshow检验.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">30</span>&nbsp; <span class="chapter-title">hosmer-lemeshow检验</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">31</span>&nbsp; <span class="chapter-title">Cox回归校准曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-qhscrnomo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">32</span>&nbsp; <span class="chapter-title">竞争风险模型的校准曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">33</span>&nbsp; <span class="chapter-title">lasso回归校准曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">34</span>&nbsp; <span class="chapter-title">分类数据的决策曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">35</span>&nbsp; <span class="chapter-title">生存数据的决策曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-diy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">36</span>&nbsp; <span class="chapter-title">适用一切模型的决策曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./DCA彩色条带.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">37</span>&nbsp; <span class="chapter-title">决策曲线添加彩色条带</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bootstrap一切指标.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">38</span>&nbsp; <span class="chapter-title">bootstrap一切指标</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./多模型比较.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">多模型比较</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">39</span>&nbsp; <span class="chapter-title">tidymodels实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_mlr3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">40</span>&nbsp; <span class="chapter-title">mlr3实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_caret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">41</span>&nbsp; <span class="chapter-title">caret实现多模型比较</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">其他内容</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./BMJ预测模型样本量计算.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">42</span>&nbsp; <span class="chapter-title">开发预测模型样本量计算</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mice多重插补.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">43</span>&nbsp; <span class="chapter-title">mice多重插补</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">附录</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./9999-appendix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">其他合集</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目录</h2>
+   
+  <ul>
+  <li><a href="#从医学统计到机器学习" id="toc-从医学统计到机器学习" class="nav-link active" data-scroll-target="#从医学统计到机器学习"><span class="header-section-number">3.1</span> 从医学统计到机器学习</a></li>
+  <li><a href="#机器学习在临床中的应用" id="toc-机器学习在临床中的应用" class="nav-link" data-scroll-target="#机器学习在临床中的应用"><span class="header-section-number">3.2</span> 机器学习在临床中的应用</a></li>
+  <li><a href="#机器学习和临床预测模型有什么关系" id="toc-机器学习和临床预测模型有什么关系" class="nav-link" data-scroll-target="#机器学习和临床预测模型有什么关系"><span class="header-section-number">3.3</span> 机器学习和临床预测模型有什么关系？</a></li>
+  <li><a href="#当我们谈论临床预测模型时我们在谈些什么" id="toc-当我们谈论临床预测模型时我们在谈些什么" class="nav-link" data-scroll-target="#当我们谈论临床预测模型时我们在谈些什么"><span class="header-section-number">3.4</span> 当我们谈论临床预测模型时，我们在谈些什么？</a></li>
+  <li><a href="#机器学习与临床预测模型需要哪些知识" id="toc-机器学习与临床预测模型需要哪些知识" class="nav-link" data-scroll-target="#机器学习与临床预测模型需要哪些知识"><span class="header-section-number">3.5</span> 机器学习与临床预测模型需要哪些知识</a>
+  <ul class="collapse">
+  <li><a href="#统计学知识" id="toc-统计学知识" class="nav-link" data-scroll-target="#统计学知识"><span class="header-section-number">3.5.1</span> 统计学知识</a></li>
+  <li><a href="#机器学习基础" id="toc-机器学习基础" class="nav-link" data-scroll-target="#机器学习基础"><span class="header-section-number">3.5.2</span> 机器学习基础</a></li>
+  <li><a href="#统计软件和编程" id="toc-统计软件和编程" class="nav-link" data-scroll-target="#统计软件和编程"><span class="header-section-number">3.5.3</span> 统计软件和编程</a></li>
+  <li><a href="#附如果你要学习生信数据挖掘" id="toc-附如果你要学习生信数据挖掘" class="nav-link" data-scroll-target="#附如果你要学习生信数据挖掘"><span class="header-section-number">3.5.4</span> 附:如果你要学习生信数据挖掘</a></li>
+  </ul></li>
+  <li><a href="#临床预测模型常见发文类型" id="toc-临床预测模型常见发文类型" class="nav-link" data-scroll-target="#临床预测模型常见发文类型"><span class="header-section-number">3.6</span> 临床预测模型常见发文类型</a>
+  <ul class="collapse">
+  <li><a href="#比较简单的" id="toc-比较简单的" class="nav-link" data-scroll-target="#比较简单的"><span class="header-section-number">3.6.1</span> 比较简单的</a></li>
+  <li><a href="#更加典型的案例" id="toc-更加典型的案例" class="nav-link" data-scroll-target="#更加典型的案例"><span class="header-section-number">3.6.2</span> 更加典型的案例</a></li>
+  <li><a href="#机器学习方法的使用" id="toc-机器学习方法的使用" class="nav-link" data-scroll-target="#机器学习方法的使用"><span class="header-section-number">3.6.3</span> 机器学习方法的使用</a></li>
+  </ul></li>
+  <li><a href="#临床预测模型和生信数据挖掘结合" id="toc-临床预测模型和生信数据挖掘结合" class="nav-link" data-scroll-target="#临床预测模型和生信数据挖掘结合"><span class="header-section-number">3.7</span> 临床预测模型和生信数据挖掘结合</a>
+  <ul class="collapse">
+  <li><a href="#生信数据挖掘到底在挖什么" id="toc-生信数据挖掘到底在挖什么" class="nav-link" data-scroll-target="#生信数据挖掘到底在挖什么"><span class="header-section-number">3.7.1</span> 生信数据挖掘，到底在挖什么？</a></li>
+  <li><a href="#比较简单的-1" id="toc-比较简单的-1" class="nav-link" data-scroll-target="#比较简单的-1"><span class="header-section-number">3.7.2</span> 比较简单的</a></li>
+  <li><a href="#复杂的" id="toc-复杂的" class="nav-link" data-scroll-target="#复杂的"><span class="header-section-number">3.7.3</span> 复杂的</a></li>
+  </ul></li>
+  <li><a href="#总结" id="toc-总结" class="nav-link" data-scroll-target="#总结"><span class="header-section-number">3.8</span> 总结</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/ayueme/R_clinical_model/issues/new" class="toc-action"><i class="bi bi-github"></i>报告问题</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./临床预测模型概念.html">基础知识</a></li><li class="breadcrumb-item"><a href="./临床预测模型和机器学习.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">临床预测模型和机器学习</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">临床预测模型和机器学习</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="从医学统计到机器学习" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="从医学统计到机器学习"><span class="header-section-number">3.1</span> 从医学统计到机器学习</h2>
+<p>机器学习离医学生/医生很遥远吗？</p>
+<p>并不是，其实大家都学过。</p>
+<blockquote class="blockquote">
+<p>医学统计学是一门<strong>运用统计学的原理和方法，研究医学科研中有关数据的收集、整理和分析的应用科学</strong>。–孙振球，徐勇勇《医学统计学》第4版</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>机器学习是一门多学科交叉专业，涵盖概率论知识，统计学知识，近似理论知识和复杂算法知识，使用计算机作为工具并致力于真实实时的模拟人类学习方式，并将现有内容进行知识结构划分来有效提高学习效率。–百度百科</p>
+</blockquote>
+<p>结合我们的医学背景讲，机器学习是能够帮我们决策的工具。机器学习中的部分内容我们并不陌生。</p>
+<p>医学统计学中都学过<strong>多元线性回归、logistic回归、判别分析、聚类分析</strong>等，这些都是机器学习的范畴，都属于机器学习的方法。只不过是所处的情境不同，就像一个人可以有多种身份。</p>
+<p>在logistic回归中，我们通过多个自变量建立logistic回归方程，由此来判断因变量的状态，比如患病/不患病，肿瘤/非肿瘤，死亡/生存等；在多元线性回归中，我们可以通过多个自变量预测患者的血糖水平。</p>
+<p>这些问题在医学统计学中，我们的<strong>目的是探寻自变量和因变量的关系</strong>，在机器学习中也是一样的用法，不过此时的目的更偏向于<strong>预测结果</strong>。除此之外，机器学习面向的主要是大样本量的数据，而医学统计学在使用这些方法时，通常是样本量不大的。</p>
+<p>除了我们学习过的多元线性回归、logistic回归等，还有一些医学统计学中没有讲到的内容，比如大家经常见到的：随机森林，lasso/ridge/elastic net，支持向量机，knn等，都属于机器学习的内容，都是类似的用法，用多个自变量预测一个因变量。</p>
+</section>
+<section id="机器学习在临床中的应用" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="机器学习在临床中的应用"><span class="header-section-number">3.2</span> 机器学习在临床中的应用</h2>
+<p>机器学习在很多领域应用广泛，在医学领域，大家经常接触的主要是以下几个方面：</p>
+<ul>
+<li>影像组学</li>
+<li>生信数据挖掘</li>
+<li>临床预测模型</li>
+<li>……</li>
+</ul>
+<p>这里面我认为<strong>最简单的就是临床预测模型</strong>。</p>
+<p>另外两个需要额外学习的背景知识太多，对于医学生/医生，尤其是临床医学、中医学等，不亚于从0开始学习一门技能。</p>
+<p>今天我们简单介绍下机器学习和临床预测模型的应用。</p>
+</section>
+<section id="机器学习和临床预测模型有什么关系" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="机器学习和临床预测模型有什么关系"><span class="header-section-number">3.3</span> 机器学习和临床预测模型有什么关系？</h2>
+<p>首先大家要明确，临床预测模型是什么？</p>
+<blockquote class="blockquote">
+<p>临床预测模型的本质是一种<strong>分类方法</strong>。通过这种方法，你可以对很多东西进行分类，比如，生和死、有病和没病、肿瘤和非肿瘤、复发和不复发等等。</p>
+<p>再直白一点，临床预测模型是<strong>一个公式</strong>，根据这个公式，你提供一些基本信息，比如年龄、性别、体重、血红蛋白量等（或者某个基因的表达量等），就可以计算出这个人到底是有病还是没病！–《简单易懂：什么是临床预测模型》</p>
+</blockquote>
+<p>你看这个过程是不是和我们上面建立多元线性回归、logistic回归的过程一模一样？也是<strong>多个自变量和一个因变量的故事</strong>。</p>
+<p>所以，<strong>临床预测模型的各种实现，都是通过机器学习的方法完成的</strong>（你非说是通过统计学的方法也可以，因为二者本来就没有清晰的界限）。这其中比较简单的也是比较常见的是logistic回归、cox回归这些，其他方法，如随机森林、SVM、各种提升算法等，也都逐渐开始使用。</p>
+<p>除此之外，大家常见的各种重抽样方法，比如<code>bootstrap</code>、<code>cross validation</code>、<code>holdout(train/test split)</code>等，都是机器学习中常见的基本内容。</p>
+<p>各种对变量的处理，比如：中心化、标准化、缺失值插补、样条回归、boxcox、向前/向后/逐步选择、最优子集，等，也都是机器学习的基础内容。</p>
+<p>唯一不同且是最重要的一点：<strong>临床预测模型更加注重结合临床背景进行解释</strong>。</p>
+<p>不同于机器学习中变量重要性(随机森林)这种解释，我们更喜欢<code>OR/HR/RR</code>这种解释，自变量每增加一个单位，因变量的危险增加多少、大于60岁的人相比于小于60岁的人，患某病的风险增加多少。</p>
+<p><strong>临床预测模型必须不能脱离临床，单纯的数字游戏没有任何意义。</strong></p>
+<blockquote class="blockquote">
+<p>很多讲临床预测模型的课程，涉及的机器学习基本方法太少，指南里的东西大家都知道，满足不了大家发文章的需求。</p>
+</blockquote>
+</section>
+<section id="当我们谈论临床预测模型时我们在谈些什么" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="当我们谈论临床预测模型时我们在谈些什么"><span class="header-section-number">3.4</span> 当我们谈论临床预测模型时，我们在谈些什么？</h2>
+<p>这个答案大家应该都很感兴趣：<strong>文章！SCI！</strong></p>
+<p>临床预测模型本质上应该是为医务人员提供新的诊疗工具、决策工具，开发更为快捷、简便、性价比高的量化工具。比较熟悉并且十分成功的案例：<strong>肿瘤的TNM分期</strong>。</p>
+<p>但是目前来看，主要作用是为大家提供新的发文方式！</p>
+<p><img src="figs/PixPin_2024-09-30_16-48-15.png" class="img-fluid"></p>
+<blockquote class="blockquote">
+<p>绝大多数临床预测模型类文章都没有实用价值。</p>
+</blockquote>
+</section>
+<section id="机器学习与临床预测模型需要哪些知识" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="机器学习与临床预测模型需要哪些知识"><span class="header-section-number">3.5</span> 机器学习与临床预测模型需要哪些知识</h2>
+<section id="统计学知识" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="统计学知识"><span class="header-section-number">3.5.1</span> 统计学知识</h3>
+<p>这块知识对于大家应该不陌生，很好上手。</p>
+<p>医学统计学，特别是多元线性回归、logistic回归、Cox回归，需要重点掌握。</p>
+<p>除此之外，需要学习一些课本上没有的、但是文献中经常见的统计学方法和指标。</p>
+<p>灵活使用，举一反三，不能还停留在t检验、方差分析的阶段，需重点掌握<strong>结果的解释</strong>。</p>
+</section>
+<section id="机器学习基础" class="level3" data-number="3.5.2">
+<h3 data-number="3.5.2" class="anchored" data-anchor-id="机器学习基础"><span class="header-section-number">3.5.2</span> 机器学习基础</h3>
+<p>这部分内容需要重新学习，但是不需要掌握复杂的原理，数学公式推导等，需要学会：</p>
+<ul>
+<li><strong>常见的数据预处理方法</strong>：Garbage In, Garbage Out
+<ul>
+<li>对数值型变量的处理
+<ul>
+<li>中心化、标准化、零方差/近零方差、共线性、分箱、样条变换、等</li>
+</ul></li>
+<li>对分类变量的处理：哑变量/独热编码等</li>
+<li>对因变量的处理：类不平衡</li>
+<li>缺失值处理：删除、插补</li>
+</ul></li>
+<li>特征工程：特征选择</li>
+<li>超参数调优</li>
+</ul>
+<p><em>存在的问题：处理后不管是单位还是尺度都已变化，怎么解释？</em></p>
+<p>除此之外，还需学习<strong>常见的机器学习算法</strong>：</p>
+<ul>
+<li>线性回归</li>
+<li>logistic回归</li>
+<li>lasso/ridge/elastic net</li>
+<li>决策树</li>
+<li>集成算法：随机森林、梯度提升树等</li>
+<li>KNN</li>
+<li>SVM</li>
+<li>和生存分析相关的机器学习算法：正则化Cox、随机生存森林、survival SVM、Coxboost等</li>
+<li>聚类分析、主成分分分析、因子分析</li>
+<li>……</li>
+</ul>
+<p>对于以上算法，只需学会使用即可，知道哪些算法可以用于什么样的数据、需要哪些数据预处理，结果如何解读等。</p>
+</section>
+<section id="统计软件和编程" class="level3" data-number="3.5.3">
+<h3 data-number="3.5.3" class="anchored" data-anchor-id="统计软件和编程"><span class="header-section-number">3.5.3</span> 统计软件和编程</h3>
+<ul>
+<li><p>SPSS，简单方便</p></li>
+<li><p>R语言，必学！</p>
+<ul>
+<li>我是医学生，R和python我应该学哪一个？</li>
+</ul></li>
+<li><p>python，影像组学建议学</p></li>
+<li><p>Linux，生信数据挖掘建议学</p></li>
+</ul>
+</section>
+<section id="附如果你要学习生信数据挖掘" class="level3" data-number="3.5.4">
+<h3 data-number="3.5.4" class="anchored" data-anchor-id="附如果你要学习生信数据挖掘"><span class="header-section-number">3.5.4</span> 附:如果你要学习生信数据挖掘</h3>
+<p><strong>下游分析需要掌握的基础知识：</strong></p>
+<p>以上所有，外加：</p>
+<p>什么是芯片，常用的芯片平台有哪些？ 什么是GEO？表达矩阵，探针id转换？</p>
+<p>什么是一代测序，二代测序，三代测序？ 什么是counts，tpm, fpkm？ 什么是TCGA？ TCGA包含哪些数据？ 什么是编码基因？mRNA, lncRNA, miRNA, circRNA等？ 生信常见的各种数据库id, hgnc gene symbol, entrez id, ensembl id等？ 中心法则？ 表观遗传涉及哪些内容？ 什么是甲基化？单核苷酸多态性SNP, 拷贝数变异CVN？</p>
+<p>什么是gtf, gff, 参考基因组，基因组注释文件？ 常见的生信数据存放格式?fastp, fastq, bam, sam,</p>
+<p>氨基酸缩写？ 人类染色体命名规则？</p>
+<p>常见的生信下游分析方法？差异分析，生存分析，富集分析，WGCNA，免疫相关分析，治疗相关分析等，在不同数据类型（转录组、甲基化等）中？</p>
+<p>…</p>
+<p>上游分析需要的知识也很多。</p>
+<blockquote class="blockquote">
+<p>我的主要学习阵地：哔哩哔哩！解决你80%的问题</p>
+</blockquote>
+</section>
+</section>
+<section id="临床预测模型常见发文类型" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="临床预测模型常见发文类型"><span class="header-section-number">3.6</span> 临床预测模型常见发文类型</h2>
+<p><strong>临床预测模型类文章主要内容是3个部分</strong>：</p>
+<ol type="1">
+<li>模型的建立-各种算法，logistic、决策树等等</li>
+<li>模型的评价-各种指标和图表，ROC、C-index、校准曲线、决策曲线等等</li>
+<li>模型的解释：<strong>临床预测模型必须不能脱离临床，单纯的数字游戏没有任何意义。</strong></li>
+</ol>
+<section id="比较简单的" class="level3" data-number="3.6.1">
+<h3 data-number="3.6.1" class="anchored" data-anchor-id="比较简单的"><span class="header-section-number">3.6.1</span> 比较简单的</h3>
+<blockquote class="blockquote">
+<p>算法不复杂，步骤也不复杂。只需要logistic回归、Cox回归、Lasso即可。</p>
+</blockquote>
+<ul>
+<li>诺莫图预测 转移性去势抵抗性前列腺癌经过 Lu177-PSMA 治疗后 的预后</li>
+</ul>
+<p>收集一些病人，监测一些指标，建立cox回归，评价模型，解释模型。</p>
+<p><img src="figs/PixPin_2024-09-30_16-49-15.png" class="img-fluid"> <img src="figs/PixPin_2024-09-30_16-50-03.png" class="img-fluid"> <img src="figs/PixPin_2024-09-30_16-50-22.png" class="img-fluid"></p>
+</section>
+<section id="更加典型的案例" class="level3" data-number="3.6.2">
+<h3 data-number="3.6.2" class="anchored" data-anchor-id="更加典型的案例"><span class="header-section-number">3.6.2</span> 更加典型的案例</h3>
+<blockquote class="blockquote">
+<p>训练集+测试集，各来一遍，各种图、指标都用上：nomogram、ROC曲线、校准曲线、决策曲线、K-M生存曲线、C-index等。</p>
+</blockquote>
+<ul>
+<li>临床预测模型评估COVID-19患者的风险</li>
+</ul>
+<p>收集一些病人，监测一些指标，建立模型，评价模型，解释模型</p>
+<p><img src="figs/PixPin_2024-09-30_16-51-07.png" class="img-fluid"></p>
+</section>
+<section id="机器学习方法的使用" class="level3" data-number="3.6.3">
+<h3 data-number="3.6.3" class="anchored" data-anchor-id="机器学习方法的使用"><span class="header-section-number">3.6.3</span> 机器学习方法的使用</h3>
+<blockquote class="blockquote">
+<p>随机森林、决策树</p>
+</blockquote>
+<ul>
+<li>老年人跌倒损伤的预测模型</li>
+</ul>
+<p>收集一些病人，监测一些指标，建立随机森林模型，评价模型，解释模型</p>
+<p><img src="figs/PixPin_2024-09-30_16-51-34.png" class="img-fluid"></p>
+<blockquote class="blockquote">
+<p>Cross Validated Elastic regularized logistic regression method (cv-Enet), boosting linear regression (glmboost), random forest, and an ensemble model</p>
+</blockquote>
+<ul>
+<li>胃切除术后90天死亡率的风险预测模型</li>
+</ul>
+<p>收集一些病人，监测一些指标，建立多种模型，评价模型，解释模型</p>
+<p><img src="figs/PixPin_2024-09-30_16-52-12.png" class="img-fluid"></p>
+<blockquote class="blockquote">
+<p>随机生存森林</p>
+</blockquote>
+<ul>
+<li>预测肝癌术后早期复发，的机器学习模型</li>
+</ul>
+<p><img src="figs/PixPin_2024-09-30_16-52-37.png" class="img-fluid"></p>
+</section>
+</section>
+<section id="临床预测模型和生信数据挖掘结合" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="临床预测模型和生信数据挖掘结合"><span class="header-section-number">3.7</span> 临床预测模型和生信数据挖掘结合</h2>
+<p>也可以认为是<strong>机器学习和生信挖掘领域的结合</strong>，基本思路和常规的临床预测模型差不多，比上面介绍的临床预测模型内容更多，主要是两个方面：</p>
+<ul>
+<li><p>变量的选择</p></li>
+<li><p>指标的评价</p></li>
+</ul>
+<p>有了生信的加持，可以玩出更多花样！扩展性极大提高！工作量也成倍增加，<strong>通常此类文章机器学习只是其中一部分内容。</strong></p>
+<section id="生信数据挖掘到底在挖什么" class="level3" data-number="3.7.1">
+<h3 data-number="3.7.1" class="anchored" data-anchor-id="生信数据挖掘到底在挖什么"><span class="header-section-number">3.7.1</span> 生信数据挖掘，到底在挖什么？</h3>
+<blockquote class="blockquote">
+<p>本质是通过各种方法得到一小撮分子，再通过各种方法证明这些分子很重要！</p>
+</blockquote>
+<p><strong>寻找分子的过程通常也属于变量选择的过程，因为高通量最不缺的就是变量！</strong> 这些分子通常是mRNA/lncRNA/miRNA等。</p>
+<p>一些常见的方法：</p>
+<ul>
+<li>差异分析</li>
+<li>生存分析</li>
+<li>WGCNA</li>
+<li>免疫浸润</li>
+<li>hub gene</li>
+<li>多种方法取交集等</li>
+<li>……</li>
+</ul>
+<p>然后<strong>建立模型，这部分内容和临床预测模型差不多，也是建立各种机器学习算法</strong>：</p>
+<ul>
+<li>lasso</li>
+<li>cox</li>
+<li>logistic</li>
+<li>随机森林/随机生存森林</li>
+<li>决策树</li>
+<li>SVM</li>
+<li>KNN</li>
+<li>神经网络</li>
+<li>……</li>
+</ul>
+<p><strong>评价模型，和临床预测模型相似的内容</strong>：</p>
+<ul>
+<li>列线图</li>
+<li>校准曲线</li>
+<li>决策曲线</li>
+<li>ROC曲线</li>
+<li>生存曲线</li>
+<li>C-index/AUC</li>
+<li>……</li>
+</ul>
+<p>除此之外，还有一些<strong>生信数据挖掘特有的部分</strong>：必须和治疗/预后扯上关系</p>
+<ul>
+<li>和免疫浸润结合</li>
+<li>和富集分析结合</li>
+<li>和免疫治疗结合</li>
+<li>和其他signature/模型/指标比较</li>
+<li>各种分子分型</li>
+<li>……</li>
+</ul>
+<blockquote class="blockquote">
+<p>生信数据挖掘文章还有一个特点：紧跟热点</p>
+</blockquote>
+<p>铁死亡、铜死亡、细胞凋亡、内质网应激、肿瘤干性、缺氧、m6A、上皮-间质转化、凝血、血管生成、……</p>
+<p>理论上你去GO或者KEGG的官网，所有的分子集合都可以挖一遍；所有病理生理过程涉及的分子也都可以挖一遍（离子通道）。</p>
+<blockquote class="blockquote">
+<p>生信数据挖掘典型花里胡哨图：</p>
+</blockquote>
+<p><img src="figs/PixPin_2024-09-30_16-53-56.png" class="img-fluid"></p>
+</section>
+<section id="比较简单的-1" class="level3" data-number="3.7.2">
+<h3 data-number="3.7.2" class="anchored" data-anchor-id="比较简单的-1"><span class="header-section-number">3.7.2</span> 比较简单的</h3>
+<p>最早期的临床预测模型和生信数据挖掘结合的思路：</p>
+<ul>
+<li>gene signature、基因家族等</li>
+</ul>
+<p>通过各种方法找几个基因构建模型（早期，硬筛）</p>
+<p><img src="figs/PixPin_2024-09-30_16-54-16.png" class="img-fluid"></p>
+<p>2022年了，这种远古套路依然可以发！因为他加了实验……</p>
+<ul>
+<li>铁死亡相关的gene signature（某个病理生理过程相关的分子）</li>
+</ul>
+<p><img src="figs/PixPin_2024-09-30_16-54-44.png" class="img-fluid"></p>
+<p>思路不新，也没有实验，但是疾病没人挖掘：<strong>儿童败血性休克</strong>，机器学习只占一小部分内容，主要是寻找分子以及说明重要性：</p>
+<p><img src="figs/PixPin_2024-09-30_16-55-12.png" class="img-fluid"></p>
+</section>
+<section id="复杂的" class="level3" data-number="3.7.3">
+<h3 data-number="3.7.3" class="anchored" data-anchor-id="复杂的"><span class="header-section-number">3.7.3</span> 复杂的</h3>
+<blockquote class="blockquote">
+<p>超级复杂的工作量、泛癌、单细胞、实验验证</p>
+</blockquote>
+<ul>
+<li>细胞衰老和肿瘤微环境：机器学习内容是其中一小部分，但是不可或缺。</li>
+</ul>
+<p><img src="figs/PixPin_2024-09-30_16-55-56.png" class="img-fluid"></p>
+<p>恐怖的工作量：单是机器学习部分就有10种机器学习算法的101种组合(非常火爆的101种组合算法就是来自这篇文章！)！以及和其他已发表的模型进行比较！</p>
+<p><img src="figs/PixPin_2024-09-30_16-56-13.png" class="img-fluid"></p>
+</section>
+</section>
+<section id="总结" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="总结"><span class="header-section-number">3.8</span> 总结</h2>
+<ul>
+<li>常用的方法就那么几个，只要认真学习，都能学会！</li>
+<li>对一些细节的处理、结果的解释、好的思路和想法更加重要！<strong>用工具解决一个问题是最简单的层面</strong></li>
+<li>医学中的机器学习<strong>更加强调结合医学背景的解释</strong>，并不单单是得到更好的模型表现即可，得到模型后结合背景知识进行更加深入的谈论是必不可少的内容，也是和传统机器学习领域最大的不同之处。</li>
+</ul>
+<p>感谢大家，祝大家百发百中！</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "已复制");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "已复制");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/ayueme\.github\.io\/R_clinical_model\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./临床预测模型建立的一般步骤.html" class="pagination-link" aria-label="临床预测模型建立的一般步骤">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">临床预测模型建立的一般步骤</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./文献学习.html" class="pagination-link" aria-label="文献学习">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">文献学习</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>R语言实战临床预测模型 by 阿越.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/ayueme/R_clinical_model/issues/new" class="toc-action"><i class="bi bi-github"></i>报告问题</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>本书由 <a href="https://quarto.org/">Quarto</a> 强力驱动.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.15">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>临床预测模型的评价 – R语言实战临床预测模型</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./conf_matrix-3d.html" rel="next">
+<link href="./feature-selection_randomforest.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-018089954d508eae8a473f0b7f0491f0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-22b4451ef2a64dd3346f18820cc52094.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "没有结果",
+    "search-matching-documents-text": "匹配的文档",
+    "search-copy-link-title": "复制搜索链接",
+    "search-hide-matches-text": "隐藏其它匹配结果",
+    "search-more-match-text": "更多匹配结果",
+    "search-more-matches-text": "更多匹配结果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./临床预测模型评价.html">临床预测模型的评价</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜索" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R语言实战临床预测模型</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/ayueme/R_clinical_model/" title="源代码" class="quarto-navigation-tool px-1" aria-label="源代码"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜索"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">前言</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">基础知识</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./临床预测模型概念.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">什么是临床预测模型？</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./临床预测模型建立的一般步骤.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">临床预测模型建立的一般步骤</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./临床预测模型和机器学习.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">临床预测模型和机器学习</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./文献学习.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">文献学习</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./模型建立和可视化.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">模型建立和可视化</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data-split.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data-preprocess.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">常见的数据预处理方法</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">逻辑回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Cox回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-原理.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">列线图的本质</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-rcs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">样条回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-compete-risk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">竞争风险模型列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">lasso回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-colorfulbar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">列线图添加彩色风险分层</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-points.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">计算列线图得分及危险分层</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./feature-selection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">常见的变量选择方法</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_unimulti.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">变量选择之先单后多</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_stepwise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">变量选择之逐步回归</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_bestsubset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">变量选择之最优子集</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">lasso回归筛选变量</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_randomforest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">随机森林筛选变量</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./临床预测模型评价.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">临床预测模型的评价</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./conf_matrix-3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">三维混淆矩阵</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-binominal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">二分类ROC曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-survive.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">生存数据ROC曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">ROC曲线的显著性检验</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./roc-bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">bootstrap ROC/AUC</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">C-index的计算</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cindex-compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">C-index的比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nri.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">净重分类指数NRI</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./idi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">综合判别改善指数IDI</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">分类模型校准曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./hosmer-lemeshow检验.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">30</span>&nbsp; <span class="chapter-title">hosmer-lemeshow检验</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">31</span>&nbsp; <span class="chapter-title">Cox回归校准曲线绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-qhscrnomo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">32</span>&nbsp; <span class="chapter-title">竞争风险模型的校准曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calibration-lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">33</span>&nbsp; <span class="chapter-title">lasso回归校准曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">34</span>&nbsp; <span class="chapter-title">分类数据的决策曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">35</span>&nbsp; <span class="chapter-title">生存数据的决策曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./dca-diy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">36</span>&nbsp; <span class="chapter-title">适用一切模型的决策曲线</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./DCA彩色条带.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">37</span>&nbsp; <span class="chapter-title">决策曲线添加彩色条带</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bootstrap一切指标.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">38</span>&nbsp; <span class="chapter-title">bootstrap一切指标</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./多模型比较.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">多模型比较</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">39</span>&nbsp; <span class="chapter-title">tidymodels实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_mlr3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">40</span>&nbsp; <span class="chapter-title">mlr3实现多模型比较</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_caret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">41</span>&nbsp; <span class="chapter-title">caret实现多模型比较</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">其他内容</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./BMJ预测模型样本量计算.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">42</span>&nbsp; <span class="chapter-title">开发预测模型样本量计算</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mice多重插补.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">43</span>&nbsp; <span class="chapter-title">mice多重插补</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">附录</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./9999-appendix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">其他合集</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目录</h2>
+   
+  <ul>
+  <li><a href="#什么样的模型是优秀的模型" id="toc-什么样的模型是优秀的模型" class="nav-link active" data-scroll-target="#什么样的模型是优秀的模型">什么样的模型是优秀的模型？</a>
+  <ul class="collapse">
+  <li><a href="#区分度的评价" id="toc-区分度的评价" class="nav-link" data-scroll-target="#区分度的评价">区分度的评价</a></li>
+  <li><a href="#校准度的评价" id="toc-校准度的评价" class="nav-link" data-scroll-target="#校准度的评价">校准度的评价</a></li>
+  </ul></li>
+  <li><a href="#多个模型的比较" id="toc-多个模型的比较" class="nav-link" data-scroll-target="#多个模型的比较">多个模型的比较</a>
+  <ul class="collapse">
+  <li><a href="#nri" id="toc-nri" class="nav-link" data-scroll-target="#nri">NRI</a></li>
+  <li><a href="#idi" id="toc-idi" class="nav-link" data-scroll-target="#idi">IDI</a></li>
+  </ul></li>
+  <li><a href="#临床适用性" id="toc-临床适用性" class="nav-link" data-scroll-target="#临床适用性">临床适用性</a>
+  <ul class="collapse">
+  <li><a href="#决策曲线分析" id="toc-决策曲线分析" class="nav-link" data-scroll-target="#决策曲线分析">决策曲线分析</a></li>
+  <li><a href="#临床影响曲线" id="toc-临床影响曲线" class="nav-link" data-scroll-target="#临床影响曲线">临床影响曲线</a></li>
+  </ul></li>
+  <li><a href="#回归模型的评价" id="toc-回归模型的评价" class="nav-link" data-scroll-target="#回归模型的评价">回归模型的评价</a></li>
+  <li><a href="#参考资料" id="toc-参考资料" class="nav-link" data-scroll-target="#参考资料">参考资料</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/ayueme/R_clinical_model/issues/new" class="toc-action"><i class="bi bi-github"></i>报告问题</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">临床预测模型的评价</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>当我们建立好预测模型后，如何评价我们的模型好坏呢？当我们建立了很多不同的模型，如何评价不同模型之间的优劣呢？</p>
+<p>这一篇主要就是讲这些，其实就是一些概念的理解，用代码计算是非常简单的。</p>
+<p>总的来说，临床预测模型的评价可以从以下几个方面进行：</p>
+<ul>
+<li>区分度</li>
+<li>校准度</li>
+<li>临床适用性</li>
+<li>模型改善度</li>
+</ul>
+<p>如果你只有1个模型，不涉及模型的比较，那么就从区分度（Discrimination）、校准度（Calibration）、临床适用性三个方面进行评价。如果涉及多个模型的比较，还需要增加模型改善度相关的评价，比如：NRI和IDI。</p>
+<section id="什么样的模型是优秀的模型" class="level2">
+<h2 class="anchored" data-anchor-id="什么样的模型是优秀的模型">什么样的模型是优秀的模型？</h2>
+<blockquote class="blockquote">
+<p>一个理想的模型应该是这样的：它能正确区分所有的患者和非患者，并且能准确预测每一个个体发生危险事件的风险大小。很明显这样的模型是不存在的，我们只能朝这个方向努力。</p>
+</blockquote>
+<p>评价一个模型的好坏可以从<strong>区分度（Discrimination）和校准度（Calibration）</strong>两个方面进行。</p>
+<p><strong>区分度</strong>指的是一个模型能正确把人群分为患者/非患者，或者正确区分个体是处于低风险、还是处于高风险，或者正确预测患者是存活、还是死亡等的能力。</p>
+<p>但是一个模型只是有良好的区分度是不够的，因为临床问题是很复杂的，并不是只要正确分类就行了。对于不同的患者，可能他们都处于高风险组，但是对于51%的风险和90%的风险，我们的处理是不一样的！</p>
+<p>这就引出了<strong>校准度</strong>的概念，校准度指的是结局实际发生的概率和模型预测出的概率之间的一致性，所以校准度又叫一致性、拟合优度（goodness-of-fit），校准度体现了一个模型对绝对风险预测的准确性。</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+注释
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>尽管只靠区分度是不够的，但临床医生不应使用区分度较差的模型。区分度差的模型也没有必要进一步评价校准度了。</p>
+</div>
+</div>
+<p>一个具有良好区分度的模型，校准度不一定也很好。比如，A和B两个患者都是低分险组，A的风险是10%，B的风险是30%，如果一个模型把这两个患者都分到低风险组，那说明这个模型的区分度很好，因为分的很准；但是如果这个模型预测A的风险是1%，B的风险是3%，那么这个模型的校准度就是很差的，因为预测的概率和实际概率相差很大。如果使用这样的模型预测出来的结果处理病人的话，可能就会碰到很多问题。</p>
+<p>区分度和校准度虽然都有不足，但是一般来说，具有较差区分度的模型，其校准度也不会很好。当一个模型区分度和校准度都很差的时候，我们可以先从提高模型区分度的角度继续改进。</p>
+<section id="区分度的评价" class="level3">
+<h3 class="anchored" data-anchor-id="区分度的评价">区分度的评价</h3>
+<p>说了这么多，那我们应该用哪些指标评价模型的分类能力的强弱呢？</p>
+<p>对于二分类模型来说，临床中常用的评价指标是<strong>ROC曲线</strong>和<strong>C-Statistic</strong>。二分类模型的AUC（ROC曲线下面积）和C-Statistic是一个东西，越接近1，说明模型的区分度越好，如果接近0.5说明模型的预测结果和乱猜差不多。一般认为，AUC或者C-Statistic在0.6以下是低区分度，在0.6~0.75之间是中区分度，高于0.75是高区分度。</p>
+<p><img src="figs/Snipaste_2023-04-01_18-00-09.png" class="img-fluid"></p>
+<p>ROC曲线的横坐标是1-特异度（横坐标是特异度也可以，此时的横坐标范围是1到0），纵坐标是灵敏度，也就是横坐标是假阳性，纵坐标是真阳性，这两个指标刚好是相反的，一个大另一个就小，所以一般我们会找<strong>一个阈值</strong>，使得曲线下面积最大。但是如果考虑到临床，这样做有时也是不妥的。比如，在患者具有某些高危疾病（比如心梗、肺梗等）的风险时，我们应该采取更加激进的措施进行预防，这时我们就需要更高的灵敏度，因为不想漏诊。</p>
+<p>近几年各种机器学习方法在临床预测模型中使用的越来越多，所以模型的评价指标也有了更多的选择。对于分类模型，除了ROC曲线外，还可以使用以下指标进行评价：</p>
+<ul>
+<li><strong>混淆矩阵</strong>（Confusion Matrix）：混淆矩阵是分类任务中所有可能预测结果与真实结果的总结，包含了真阳性、假阳性、真阴性和假阴性的计数，是下述精确率、召回率等指标计算的基础。</li>
+</ul>
+<p>用一张图来总结混淆矩阵以及根据混淆矩阵计算出的各种指标（来自于<a href="https://en.wikipedia.org/wiki/Confusion_matrix">维基百科</a>）：</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/Snipaste_2023-04-01_18-19-50.png" class="img-fluid figure-img"></p>
+<figcaption>混淆矩阵</figcaption>
+</figure>
+</div>
+<p>这面这个东西，在不同的场景有不同的叫法，在机器学习和预测模型领域，它叫<strong>混淆矩阵</strong>，但是在诊断试验中，它叫<strong>诊断试验的四格表</strong>。</p>
+<p>下面要介绍的所有指标，都是根据这个混淆矩阵计算出来的！</p>
+<ul>
+<li><strong>准确率</strong>（Accuracy）：准确率是最直观的评价指标，定义为分类正确的样本数占总样本数的比例。但是在类别分布不均匀（即类别不平衡）的情况下，准确率可能产生误导。假如有100个人，其中只有1个人有癌症，其余99个没有癌症，如果模型此时把100个人都预测为没有癌症，那么准确率是99%，非常高，但是此时对于那个<strong>漏诊</strong>的人来说是不能接受的。此时漏诊率为100%，<strong>漏诊率=1-灵敏度</strong>。</li>
+<li><strong>精确率</strong>（Precision）：也叫<strong>查准率</strong>，精确率是指被模型预测为阳性的样本中，真正是阳性的比例。</li>
+<li><strong>召回率</strong>（Recall）：也叫<strong>查全率</strong>，在医学中通常被称为<strong>灵敏度</strong>（sensitivity）,<strong>真阳性率</strong>，召回率是指所有实际为阳性的样本中，被模型正确识别为阳性的比例。还是上面那个100人的例子，此时它的灵敏度就是0，这样的结果是没有意义的，因为对于临床来说，漏诊是不能被接受的。以查全率为横坐标，以查准率为纵坐标，绘制曲线，可以得到如下图所示的<strong>P-R曲线</strong>。</li>
+</ul>
+<p><img src="figs/PixPin_2024-04-28_12-56-47.png" class="img-fluid"></p>
+<ul>
+<li><strong>F1分数</strong>（F1-Score）：F1分数是精确率和召回率的加权平均值，旨在同时考虑精确率和召回率，特别适用于类别不平衡问题，范围也是[0,1]之间。精准率和召回率是相互矛盾的，一个增大另一个就会减小，所以我们需要找到一个平衡点，由此引出了F1分数，F1分数越高，说明模型越稳健。</li>
+<li><strong>特异度</strong>（Specificity）：指所有实际为阴性的样本中，被模型正确识别为阴性的比例。上述的100人的例子，特异度就是100%，也就是说你没有<strong>误诊</strong>的。误诊率是0，<strong>误诊率=1-特异度</strong>。</li>
+<li><strong>马修斯相关系数</strong>（Matthews Correlation Coefficient，MCC）：同时考虑混淆矩阵中4个类别的结果，并综合考量，范围是[-1,1]，1表示完美预测，0表示随机预测，-1表示完全相反。尤其适用于类不平衡的二分类问题。</li>
+<li><strong>均衡准确率</strong>（Balanced Accuracy）：当出现类别不平衡时，使用准确率评价可能会出现较大偏差，此时可以使用均衡准确率，它是每个类别中预测正确的比例的算术平均值。</li>
+</ul>
+<p>除了这些，还有阳性预测值/阴性预测值，也可以用来评价模型。</p>
+</section>
+<section id="校准度的评价" class="level3">
+<h3 class="anchored" data-anchor-id="校准度的评价">校准度的评价</h3>
+<p>目前校准度的评价最好的方式还是使用<strong>校准曲线</strong>（Calibration curve，或者Calibration plot)，在机器学习领域又叫可靠性曲线（reliability curve）。通过校准曲线可以非常直观地看到预测概率和真实概率的关系。</p>
+<p><img src="figs/Snipaste_2023-04-01_18-00-26.png" class="img-fluid"></p>
+<p>校准曲线的横纵坐标分别是预测概率和真实概率（横纵坐标可以互换），完美的校准曲线应该是一条斜率为1，截距是0的直线是，说明模型的预测的概率和真实概率完全一致，模型超级准确。</p>
+<p>校准度的评价可以在很多水平进行，比如，从整体角度，或者从不同的组进行等。</p>
+<p>假如100个人有20个人发生了结局事件，那么真实概率就是20%，我们的模型会对每个人都计算出一个概率，如果大于某个值（比如说0.5），我们就认为这个人会发生结局事件，小于0.5就认为不会发生结局事件，那么这100个人每个人都会得到一个概率，把100个人的概率加起来再除以100，就得到了模型预测的平均概率，这个概率就是从整体角度评价的。</p>
+<p>假如把100个人按照预测概率大小排好序，然后分成10组，每组10人，在每个组内计算模型平均概率，再和真实概率（比如一组内10人有3人发生了结局事件，那这一组的真实概率就是30%）比较，然后把真实概率作为横坐标，预测概率作为纵坐标，就可以画出Calibration curve了，这就是从不同组的角度评价的（这是目前主流做法）。</p>
+<p>除了直接查看图形，校准度还可以用统计检验来评估真实概率和预测概率的差异，比如<strong>Hosmer-Lemeshow检验（H-L 检验）</strong>，若得到的P值小于0.05，那说明模型的预测概率和真实概率之间确实有差异，不是由于随机误差导致的，若P值大于0.05，说明通过了H-L检验，预测概率和实际概率没有明显的差异。但是H-L检验无法量化差异的大小，也不能说明差异的大小在低风险患者和高风险患者之间是否存在差异。</p>
+<p>当样本量很大时，Hosmer-Lemeshow检验也可能具有误导性。在这种情况下，预测风险和真实风险之间的临床微小差异可能导致具有统计学意义的Hosmer-Lemeshow检验结果。</p>
+<p>除了校准曲线和H-L检验外，模型的校准度还可以使用以下指标进行评价：</p>
+<ul>
+<li><strong>Log Loss</strong>（交叉熵损失）：又叫对数损失、对数似然、逻辑损失，特别适用于概率预测模型，衡量预测概率分布与实际类别之间的差异。越接近0越好。</li>
+<li><strong>Brier-Score</strong>：布里尔分数，衡量模型预测的类别的概率与真实值之间的误差，仅用于二分类数据，范围是0到1，越小越好。</li>
+<li><strong>预测概率直方图</strong>：评价模型预测概率的分布，并据此判断模型的校准度。</li>
+</ul>
+<p>有一些方法可以对预测概率进行校准，使其更加接近真实结果或者可以使模型的校准曲线拟合的更佳贴近理想情况。常见的方法包括：Platt校准（Platt Scaling）、保序回归法（ isotonic regression）、贝叶斯校准（Bayesian Calibration）等。</p>
+</section>
+</section>
+<section id="多个模型的比较" class="level2">
+<h2 class="anchored" data-anchor-id="多个模型的比较">多个模型的比较</h2>
+<p>如果涉及到多个模型进行比较的话，除了区分度和校准度，还可以用<strong>净重新分类指数</strong>和<strong>综合判别改善指数</strong>来比较模型的优劣。</p>
+<section id="nri" class="level3">
+<h3 class="anchored" data-anchor-id="nri">NRI</h3>
+<p><strong>净重新分类指数</strong>（net reclassification index，NRI），是用来比较模型准确度的，这个概念有点难理解，但是非常重要，在临床研究中非常常见，是评价模型的一大利器！</p>
+<p>如果新模型比旧模型更加优秀，那么理想情况下应该是这样的：（1）对于发生终点事件的患者，新模型为其分配了比先前模型更高的风险类别（理想的重新分类），以及（2）对于未发生终点事件的患者，新模型为其分配了较低的风险类别（也是理想的重新分类）。这就是净重分类的基本理念。</p>
+<p>我们可以这样简单的理解，假如有一群受试者，有些是患病的，有些是没病的，你建立了一个模型1，通过计算把受试者分为了有病组和没病组（当然有些是分错的），然后你又建立了模型2，也是把这群受试者分成了有病组和没病组，相当于是重新分类了！2个模型计算的结果是不一样的，有的可能重新分类分对了，有的可能分错了，然后，<strong>净重分类=重新分对的-重新分错的</strong>，净重分类指数只要再除以总人数就可以了，这样得到的就是<strong>绝对净重分类指数</strong>（absolute NRI）。</p>
+<p>绝对净重分类指数反应的是模型对整体的分类能力有无改善，但是，对于有病组和没病组，都是有可能出现重新分类分对了/重新分类分错了/重新分类和之前一样，这3种情况的。所以，我们可以把有病组和没病组分开计算净重分类指数，然后再相加，这样得到的就是<strong>相加净重分类指数</strong>（additive NRI）。</p>
+<p>下面用几个例子说明相加NRI和绝对NRI的计算以及各自的优缺点。</p>
+<p>示例1假设一共有20000名患者，其中发生事件（with events）的患者（以下简称阳性）和未发生事件（without events）的患者（以下简称阴性）人数相等，都是10000人。新旧模型将患者分为低风险、中风险、高风险3组。新旧模型重新分类的结果如下图（example 1）表格所示，其中绿色的表示重新分类正确的，粉色表示重新分类错误的，灰色表示没变化，左侧表格是阳性患者的重新分类表格，右侧是阴性患者的重新分类表格。</p>
+<p>示例2假设一共有11000名患者，但是阳性（with events）的只有1000个，阴性（without events）的有10000个。新旧模型重新分类的结果也是如下图（example 2）表格所示。</p>
+<p><img src="figs/PixPin_2024-05-09_21-39-57.png" class="img-fluid"></p>
+<ul>
+<li>对于示例1来说：</li>
+</ul>
+<p>阳性患者组：新模型重新分类正确的人数是1200+400+600=2200，重新分类错误的人数是300+50+350=700，净重新分类人数是2200-700=1500， 阴性患者组：新模型重新分类正确的人数是100+50+100=250，重新分类错误的人数是300+100+150=550，净重新分类人数是250-550=-300，</p>
+<p>绝对NRI=（2200-700+250-550）/20000=0.06 相加NRI=（2200-700）/10000 +（250-550）/10000=0.12</p>
+<ul>
+<li>对于示例2来说：</li>
+</ul>
+<p>阳性患者组：新模型重新分类正确的人数是120+40+60=220，重新分类错误的人数是30+5+35=70，净重新分类人数是220-70=150， 阴性患者组：新模型重新分类正确的人数是100+50+100=250，重新分类错误的人数是300+100+150=550，净重新分类人数=250-550=-300，</p>
+<p>绝对NRI=（220-70+250-550）/11000=-0.0136 相加NRI=（220-70）/1000 + （250-550）/10000=0.12</p>
+<blockquote class="blockquote">
+<p>图中在计算时都乘了100，其实没有必要。</p>
+</blockquote>
+<p><strong>相加NRI的主要局限性在于它不考虑人群中事件和非事件的发生比例</strong>，比如在上面的示例1和示例2中，虽然示例2的发生事件的患者和不发生事件的患者比例差距很大，但是相加NRI都是0.12。绝对NRI则避免这个问题。以下示例说明了这一优势。</p>
+<p>考虑上图中的示例1，其中发生事件和未发生事件的患者比例相等。在这种情况下，相加NRI将始终是绝对NRI的2倍。绝对NRI表示新模型重新分类更佳的实际比例，如果大于0说明新模型更好，小于0说明新模型更差，等于0说明和原模型相同，在本例中新模型重新分类更佳的比例为0.06。</p>
+<p>在示例2中，发生和不发生事件的患者比例为1：10。阴性组和阳性组重新分类的数量都与示例1是相同的。由于相加NRI不考虑阴性和阳性的比例问题，所以绝对NRI还是0.12，从相加NRI来看是有利于新模型的。虽然新模型在发生事件的患者中表现得更好（净重新分类人数是150），但发生事件的患者比例太小了，新模型在未发生事件的患者中比表现的比较差（净重新分类指数是-300），两者加起来是-150，说明实际上新模型比旧模型还多分错了150个人，新模型是更差的。<strong>所以当事件发生率较低时，相加NRI可能会产生误导，而绝对NRI更能反映模型的真实情况</strong>。</p>
+<p>但是<strong>绝对NRI假设发生事件的影响与不发生事件的影响相同</strong>。临床中并不是这样的，比如对于心梗的预测，我们肯定是更关心发生心梗的，因为即使漏诊一个心梗，对于病人本来说也是无法接受的。此时我们可能会更加重视对发生事件的患者能进行更好分类的模型。这就涉及到<strong>漏诊</strong>和<strong>误诊</strong>的关系问题了。</p>
+<p>本质上，相加NRI等于（新模型灵敏度与特异度之和）减去（旧模型灵敏度与特异度之和），也就是等于（新模型的约登指数）减去（旧模型的约登指数）。</p>
+<p>所以到底怎么取舍，不能只看数字，一定要结合实际情况，写文章时遇到了不好的结果也要好好讨论！</p>
+</section>
+<section id="idi" class="level3">
+<h3 class="anchored" data-anchor-id="idi">IDI</h3>
+<p>NRI、AUC、C-Statistic都是要先设置一个阈值，然后在这个阈值的前提下进行各种比较，它们只是考虑了单独一个点的情况，不能反应模型的整体情况。因此，又来了新的指标-<strong>综合判别改善指数</strong>（Integrated Discrimination Improvement，IDI）。</p>
+<p>IDI的计算很简单，它反映了两个模型在预测概率上的差别，是基于模型对每个个体的预测概率计算所得。它的计算方法为：</p>
+<p><img src="figs/Snipaste_2023-04-01_18-03-30.png" class="img-fluid"></p>
+<p>Pnew,events：患者组，新模型对每个人预测概率的平均值；</p>
+<p>Pold,events ：患者组，旧模型对每个人预测概率的平均值；</p>
+<p>对于患者来说，那肯定是预测概率越高越准确，所以两者相减，值越大，表明新模型的预测能力越好；</p>
+<p>Pnew,non-events：非患者组，新模型对每个人预测概率的平均值；</p>
+<p>Pold,non-events：非患者组，旧模型对每个人预测概率的平均值；</p>
+<p>对于非患者来说，那肯定是预测概率越小越准确，所以两者相减，值越小，表明新模型的预测能力越好；</p>
+<p>两部分再相减，就是值越大，表明模型预测能力越好，如果IDI为负值，那说明还不如原来的模型好。</p>
+</section>
+</section>
+<section id="临床适用性" class="level2">
+<h2 class="anchored" data-anchor-id="临床适用性">临床适用性</h2>
+<p>临床都会碰到假阳性和假阴性问题，也就是误诊和漏诊问题，对于不同的疾病，可能我们需要的阈值不同，有时需要更高的假阳性，有时需要更高的假阴性，因此这就是一个实际临床效用问题，到底怎么办，才能使患者获益最大？这就是<strong>临床适用性</strong>（clinical usefulness）问题。</p>
+<section id="决策曲线分析" class="level3">
+<h3 class="anchored" data-anchor-id="决策曲线分析">决策曲线分析</h3>
+<p><strong>决策曲线分析</strong>（Decision Curve Analysis，DCA）就是为了解决这一问题。</p>
+<p>当患者有症状但尚不能诊断为某种疾病时，临床医生必须决定是(1)经验性治疗，(2)不治疗，或(3)在选择选项1和2之前进行进一步的检查。是否治疗取决于临床医生的经验、疾病治疗的有效性和并发症，以及患者接受治疗风险和负担的意愿。决策曲线分析是一种通过考虑患者风险和获益的可能范围来评估临床决策是否可行的方法。</p>
+<p>DCA中的一个关键概念是<strong>概率阈值</strong>（probability threshold），即患者选择接受治疗的概率水平。概率阈值表明患者在接受治疗（如果有病）时的相对值，以及如果不存在疾病时避免治疗的值。如果治疗疗效高、成本低、不良反应少，则概率阈值较低；相反，如果治疗效果差或与大量并发症相关（例如，恶性脑肿瘤的放疗），则概率阈值会很高。</p>
+<p><img src="figs/Snipaste_2023-04-01_18-04-12.png" class="img-fluid"></p>
+<p>结合上面这幅图，横坐标就是概率阈值。此时对于一个病人来说，治疗有可能会利大于弊，也有可能会弊大于利，纵坐标就是利减去弊之后的净获益。</p>
+<p>概率阈值也是概率，取值自然是0-1之间的，所以对于每一个概率，我们都可以计算出一个净获益（计算方法上图中给出了），然后把所有的点连起来，就是决策曲线了（上图中3条虚线，代表3种不同方法的决策曲线）。</p>
+<p>上图中还有2条特殊的线，一条水平的蓝色线，表示<strong>所有人都不接受治疗</strong>时，此时不管概率阈值是多少，净获益肯定都是0。一条黄色的线，表示<strong>所有人都接受治疗</strong>时，随着概率阈值的改变，其净获益的改变。这两条线代表了2种极端的情况。</p>
+<p>在给定的概率阈值下，肯定是净获益越大越好，所以一般来说，肯定是曲线距离两条特殊的线越远越好。在写文章时一定要写清楚到底是<strong>在哪个概率区间内</strong>，你的模型的净获益是正的。</p>
+</section>
+<section id="临床影响曲线" class="level3">
+<h3 class="anchored" data-anchor-id="临床影响曲线">临床影响曲线</h3>
+<p>临床影响曲线（Clinical Impact Curve，DCA），属于DCA的变种，是Kerr等人对DCA的进一步发展，结合下面这张图来看：</p>
+<p><img src="figs/Snipaste_2023-04-01_18-04-49.png" class="img-fluid"></p>
+<p>横坐标还是概率阈值，纵坐标是每1000人里面的高风险人数。紫色线表示在不同的概率阈值下，被模型判定为高风险的人数；红色线条表示在不同的概率阈值下，被模型判定为高风险且真的发生结局事件的人数。在最下面还增加了一个<strong>损失：获益比</strong>，表示在不同的概率阈值下，损失和获益的比例。上图表明在概率阈值大于0.6（大约）以后，模型判定为高风险的人群和实际发生终点事件的人群完全一致。</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+注释
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>临床影响曲线目前在R语言中只有<code>rmda</code>包可以绘制，而且只适用于二分类模型，不能用于生存分析中，在文献中出现的相对偏少。</p>
+</div>
+</div>
+</section>
+</section>
+<section id="回归模型的评价" class="level2">
+<h2 class="anchored" data-anchor-id="回归模型的评价">回归模型的评价</h2>
+<p>以上内容基本基本都是对于分类模型和生存模型的评价，对回归模型来说，也有一些评价指标，常用的回归模型评价指标如下所示：</p>
+<ul>
+<li><strong>均方误差</strong>（Mean Squared Error, MSE）: 定义为预测值与实际值之差的平方和的均值。</li>
+<li><strong>均方根误差</strong>（Root Mean Squared Error, RMSE）: 是MSE的平方根，使得其单位与目标变量相同，便于解释。RMSE对异常值很敏感，极端异常值会让RMSE明显变大。如果只是为了衡量模型整体的误差，则使用RMSE更佳。</li>
+<li><strong>平均绝对误差</strong>（Mean Absolute Error, MAE）: 计算预测值与实际值之间绝对差值的平均数。MAE对所有误差给予相等的权重，不被大误差过分影响，比RMSE更适合有极端值的情况。</li>
+<li><strong>平均绝对百分比误差</strong>（Mean Absolute Percentage Error, MAPE）: 计算预测误差相对于实际值的百分比的平均值，适用于对预测误差的相对大小更感兴趣的场景。</li>
+<li><strong>中位绝对误差</strong>（Median Absolute Error, MAE）：</li>
+<li><strong>R²</strong>（决定系数，Coefficient of Determination）: 表示模型解释的变异量占总变异量的比例，值范围从0到1，越接近1表示模型拟合越好。R²衡量了模型解释数据变异的能力。</li>
+<li><strong>解释方差分数</strong>（Explained Variance Score）: 类似于R²，但直接作为比例表示模型解释的方差部分，值越大表示模型拟合越好。</li>
+</ul>
+<p>凡是叫<strong>xxx误差</strong>的指标，一般都是越小说明模型越好。</p>
+<p>了解这些基础内容后，我们就可以通过各种各样的工具实现它，后面我们将会详细介绍如果通过R语言计算以上指标。</p>
+</section>
+<section id="参考资料" class="level2">
+<h2 class="anchored" data-anchor-id="参考资料">参考资料</h2>
+<p>[1] Alba A C, Agoritsas T, Walsh M, et al.&nbsp;Discrimination and Calibration of Clinical Prediction Models: Users’ Guides to the Medical Literature[J]. JAMA, 2017, 318(14): 1377–1384. DOI:10.1001/jama.2017.12126. [2] Fitzgerald M, Saville B R, Lewis R J. Decision curve analysis[J]. JAMA, 2015, 313(4): 409–410. DOI:10.1001/jama.2015.37.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "已复制");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "已复制");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/ayueme\.github\.io\/R_clinical_model\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./feature-selection_randomforest.html" class="pagination-link" aria-label="随机森林筛选变量">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">随机森林筛选变量</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./conf_matrix-3d.html" class="pagination-link" aria-label="三维混淆矩阵">
+        <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">三维混淆矩阵</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>R语言实战临床预测模型 by 阿越.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/ayueme/R_clinical_model/issues/new" class="toc-action"><i class="bi bi-github"></i>报告问题</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>本书由 <a href="https://quarto.org/">Quarto</a> 强力驱动.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

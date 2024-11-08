@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.302">
+<meta name="generator" content="quarto-1.6.15">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>R语言实战临床预测模型 - 附录 B — 常见的数据划分方法</title>
+<title>5&nbsp; 常见的数据划分方法 – R语言实战临床预测模型</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,24 +30,30 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./9999-appendix.html" rel="next">
-<link href="./data-preprocess.html" rel="prev">
+<link href="./data-preprocess.html" rel="next">
+<link href="./模型建立和可视化.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-018089954d508eae8a473f0b7f0491f0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-22b4451ef2a64dd3346f18820cc52094.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "没有结果",
     "search-matching-documents-text": "匹配的文档",
@@ -56,8 +62,10 @@ ul.task-list li input[type="checkbox"] {
     "search-more-match-text": "更多匹配结果",
     "search-more-matches-text": "更多匹配结果",
     "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "取消",
-    "search-submit-button-title": "提交"
+    "search-submit-button-title": "提交",
+    "search-label": "搜索"
   }
 }</script>
 
@@ -70,13 +78,13 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./data-preprocess.html">附录</a></li><li class="breadcrumb-item"><a href="./data-split.html"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./模型建立和可视化.html">模型建立和可视化</a></li><li class="breadcrumb-item"><a href="./data-split.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切换侧边栏导航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜索" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -85,18 +93,18 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">R语言实战临床预测模型</a> 
         <div class="sidebar-tools-main">
-    <a href="https://https://github.com/ayueme/R_clinical_model" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="https://github.com/ayueme/R_clinical_model/" title="源代码" class="quarto-navigation-tool px-1" aria-label="源代码"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
+        <div id="quarto-search" class="" title="搜索"></div>
         </div>
         </div>
     <div class="sidebar-menu-container"> 
@@ -109,171 +117,182 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
- <span class="menu-text">模型建立</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="切換部分">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">基础知识</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="切換部分">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./clinmodel-definition.html" class="sidebar-item-text sidebar-link">
+  <a href="./临床预测模型概念.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">什么是临床预测模型？</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nomogram-logistic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">logistic回归列线图绘制</span></span></a>
+  <a href="./临床预测模型建立的一般步骤.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">临床预测模型建立的一般步骤</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nomogram-cox.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Cox回归列线图绘制</span></span></a>
+  <a href="./临床预测模型和机器学习.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">临床预测模型和机器学习</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./nomogram-essential.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">列线图的本质</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./nomogram-rcs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">样条回归列线图绘制</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./nomogram-compete-risk.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">竞争风险模型列线图绘制</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./nomogram-lasso.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">lasso回归列线图绘制</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./nomogram-colorfulbar.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">列线图添加彩色风险分层</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./nomogram-points.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">计算列线图得分及危险分层</span></span></a>
+  <a href="./文献学习.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">文献学习</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
- <span class="menu-text">变量筛选</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="切換部分">
+            <a href="./模型建立和可视化.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">模型建立和可视化</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="切換部分">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./feature-selection.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">常见的变量选择方法</span></span></a>
+  <a href="./data-split.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./feature-selection_unimulti.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">变量筛选之先单后多</span></span></a>
+  <a href="./data-preprocess.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">常见的数据预处理方法</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./feature-selection_stepwise.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">筛选变量逐步回归</span></span></a>
+  <a href="./nomogram-logistic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">逻辑回归列线图绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./feature-selection_bestsubset.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">变量筛选之最优子集</span></span></a>
+  <a href="./nomogram-cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Cox回归列线图绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./feature-selection_lasso.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">lasso回归筛选变量</span></span></a>
+  <a href="./nomogram-原理.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">列线图的本质</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./feature-selection_randomforest.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">变量筛选之随机森林</span></span></a>
+  <a href="./nomogram-rcs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">样条回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-compete-risk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">竞争风险模型列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">lasso回归列线图绘制</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-colorfulbar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">列线图添加彩色风险分层</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nomogram-points.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">计算列线图得分及危险分层</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
- <span class="menu-text">模型评价</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="切換部分">
+            <a href="./feature-selection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">常见的变量选择方法</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="切換部分">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./clinmodel-evalution.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">临床预测模型的评价方法</span></span></a>
+  <a href="./feature-selection_unimulti.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">变量选择之先单后多</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_stepwise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">变量选择之逐步回归</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_bestsubset.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">变量选择之最优子集</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_lasso.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">lasso回归筛选变量</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./feature-selection_randomforest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">随机森林筛选变量</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./临床预测模型评价.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">临床预测模型的评价</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./conf_matrix-3d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">三维混淆矩阵</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./roc-binominal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">二分类资料ROC曲线绘制</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">二分类ROC曲线绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./roc-survive.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">生存资料ROC曲线绘制</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./roc-bestcut.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">ROC曲线的最佳截点</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./roc-smooth.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">平滑ROC曲线</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">生存数据ROC曲线绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./roc-compare.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">ROC曲线的显著性检验</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./roc-attention.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">R语言计算AUC(ROC)注意事项</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./roc-many.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">多指标联合诊断的ROC曲线</span></span></a>
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">ROC曲线的显著性检验</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -284,192 +303,155 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./多分类数据的ROC曲线.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">多分类数据的ROC曲线</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./cindex.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">C-index的计算</span></span></a>
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">C-index的计算</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./cindex-compare.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">C-index的比较</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./conf_matrix-3d.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">三维混淆矩阵</span></span></a>
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">C-index的比较</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./nri.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">NRI净重新分类指数</span></span></a>
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">净重分类指数NRI</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./idi.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">30</span>&nbsp; <span class="chapter-title">IDI综合判别改善指数</span></span></a>
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">综合判别改善指数IDI</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./calibration-logistic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">31</span>&nbsp; <span class="chapter-title">logistic回归校准曲线绘制</span></span></a>
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">分类模型校准曲线绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./calibration-logistic-test.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">32</span>&nbsp; <span class="chapter-title">logistic回归测试集校准曲线的绘制</span></span></a>
+  <a href="./hosmer-lemeshow检验.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">30</span>&nbsp; <span class="chapter-title">hosmer-lemeshow检验</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./calibration-cox.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">33</span>&nbsp; <span class="chapter-title">Cox回归校准曲线绘制</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./calibration-cox-test.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">34</span>&nbsp; <span class="chapter-title">Cox回归测试集校准曲线绘制</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./calibration-tidymodels-man.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">35</span>&nbsp; <span class="chapter-title">tidymodels手动绘制校准曲线</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./calibration-tidymodels.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">36</span>&nbsp; <span class="chapter-title">tidymodels已原生支持校准曲线</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./calibration-mlr3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">37</span>&nbsp; <span class="chapter-title">mlr3绘制校准曲线</span></span></a>
+ <span class="menu-text"><span class="chapter-number">31</span>&nbsp; <span class="chapter-title">Cox回归校准曲线绘制</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./calibration-qhscrnomo.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">38</span>&nbsp; <span class="chapter-title">竞争风险模型的校准曲线</span></span></a>
+ <span class="menu-text"><span class="chapter-number">32</span>&nbsp; <span class="chapter-title">竞争风险模型的校准曲线</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./calibration-lasso.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">39</span>&nbsp; <span class="chapter-title">lasso回归列线图、校准曲线、内外部验证</span></span></a>
+ <span class="menu-text"><span class="chapter-number">33</span>&nbsp; <span class="chapter-title">lasso回归校准曲线</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./dca-logistic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">40</span>&nbsp; <span class="chapter-title">分类数据的决策曲线分析</span></span></a>
+ <span class="menu-text"><span class="chapter-number">34</span>&nbsp; <span class="chapter-title">分类数据的决策曲线</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./dca-cox.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">41</span>&nbsp; <span class="chapter-title">生存数据的决策曲线分析</span></span></a>
+ <span class="menu-text"><span class="chapter-number">35</span>&nbsp; <span class="chapter-title">生存数据的决策曲线</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./dca-diy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">42</span>&nbsp; <span class="chapter-title">适用于一切模型的决策曲线分析</span></span></a>
+ <span class="menu-text"><span class="chapter-number">36</span>&nbsp; <span class="chapter-title">适用一切模型的决策曲线</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./DCA彩色条带.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">43</span>&nbsp; <span class="chapter-title">决策曲线添加彩色条带</span></span></a>
+ <span class="menu-text"><span class="chapter-number">37</span>&nbsp; <span class="chapter-title">决策曲线添加彩色条带</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./DCA测试集.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">44</span>&nbsp; <span class="chapter-title">测试集的决策曲线分析</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./校准曲线和决策曲线的概率.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">45</span>&nbsp; <span class="chapter-title">校准曲线和决策曲线的概率</span></span></a>
+  <a href="./bootstrap一切指标.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">38</span>&nbsp; <span class="chapter-title">bootstrap一切指标</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
- <span class="menu-text">模型比较</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="切換部分">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./model-compare_tidymodels.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">46</span>&nbsp; <span class="chapter-title">tidymodels实现多模型比较</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./model-compare_workflow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">47</span>&nbsp; <span class="chapter-title">workflow实现多模型比较</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./model-compare_mlr3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">48</span>&nbsp; <span class="chapter-title">mlr3实现多模型比较</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./model-compare_caret.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">49</span>&nbsp; <span class="chapter-title">caret实现多模型比较</span></span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
- <span class="menu-text">附录</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="切換部分">
+            <a href="./多模型比较.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">多模型比较</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="切換部分">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./data-preprocess.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">常见的数据预处理方法</span></span></a>
+  <a href="./model-compare_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">39</span>&nbsp; <span class="chapter-title">tidymodels实现多模型比较</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./data-split.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></span></a>
+  <a href="./model-compare_mlr3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">40</span>&nbsp; <span class="chapter-title">mlr3实现多模型比较</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./model-compare_caret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">41</span>&nbsp; <span class="chapter-title">caret实现多模型比较</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">其他内容</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./BMJ预测模型样本量计算.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">42</span>&nbsp; <span class="chapter-title">开发预测模型样本量计算</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mice多重插补.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">43</span>&nbsp; <span class="chapter-title">mice多重插补</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">附录</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="切換部分">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./9999-appendix.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">其他合集</span></span></a>
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">其他合集</span></span></a>
   </div>
 </li>
       </ul>
@@ -477,29 +459,30 @@ ul.task-list li input[type="checkbox"] {
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">目录</h2>
    
   <ul>
-  <li><a href="#留出法holdout" id="toc-留出法holdout" class="nav-link active" data-scroll-target="#留出法holdout"><span class="header-section-number">B.1</span> 留出法(holdout)</a></li>
-  <li><a href="#交叉验证cross-validation" id="toc-交叉验证cross-validation" class="nav-link" data-scroll-target="#交叉验证cross-validation"><span class="header-section-number">B.2</span> 交叉验证(cross validation)</a></li>
-  <li><a href="#bootstrap" id="toc-bootstrap" class="nav-link" data-scroll-target="#bootstrap"><span class="header-section-number">B.3</span> bootstrap</a></li>
-  <li><a href="#其他方法" id="toc-其他方法" class="nav-link" data-scroll-target="#其他方法"><span class="header-section-number">B.4</span> 其他方法</a></li>
-  <li><a href="#重抽样的目的" id="toc-重抽样的目的" class="nav-link" data-scroll-target="#重抽样的目的"><span class="header-section-number">B.5</span> 重抽样的目的</a></li>
-  <li><a href="#为什么要单独划分出一部分数据" id="toc-为什么要单独划分出一部分数据" class="nav-link" data-scroll-target="#为什么要单独划分出一部分数据"><span class="header-section-number">B.6</span> 为什么要单独划分出一部分数据</a></li>
-  <li><a href="#方法选择建议" id="toc-方法选择建议" class="nav-link" data-scroll-target="#方法选择建议"><span class="header-section-number">B.7</span> 方法选择建议</a></li>
+  <li><a href="#留出法holdout" id="toc-留出法holdout" class="nav-link active" data-scroll-target="#留出法holdout"><span class="header-section-number">5.1</span> 留出法(holdout)</a></li>
+  <li><a href="#交叉验证cross-validation" id="toc-交叉验证cross-validation" class="nav-link" data-scroll-target="#交叉验证cross-validation"><span class="header-section-number">5.2</span> 交叉验证(cross validation)</a></li>
+  <li><a href="#bootstrap" id="toc-bootstrap" class="nav-link" data-scroll-target="#bootstrap"><span class="header-section-number">5.3</span> bootstrap</a></li>
+  <li><a href="#其他方法" id="toc-其他方法" class="nav-link" data-scroll-target="#其他方法"><span class="header-section-number">5.4</span> 其他方法</a></li>
+  <li><a href="#内部验证外部验证" id="toc-内部验证外部验证" class="nav-link" data-scroll-target="#内部验证外部验证"><span class="header-section-number">5.5</span> 内部验证/外部验证</a></li>
+  <li><a href="#重抽样的目的" id="toc-重抽样的目的" class="nav-link" data-scroll-target="#重抽样的目的"><span class="header-section-number">5.6</span> 重抽样的目的</a></li>
+  <li><a href="#为什么要单独划分" id="toc-为什么要单独划分" class="nav-link" data-scroll-target="#为什么要单独划分"><span class="header-section-number">5.7</span> 为什么要单独划分</a></li>
+  <li><a href="#方法选择建议" id="toc-方法选择建议" class="nav-link" data-scroll-target="#方法选择建议"><span class="header-section-number">5.8</span> 方法选择建议</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://https://github.com/ayueme/R_clinical_model/issues/new" class="toc-action">报告问题</a></p></div></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/ayueme/R_clinical_model/issues/new" class="toc-action"><i class="bi bi-github"></i>报告问题</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./模型建立和可视化.html">模型建立和可视化</a></li><li class="breadcrumb-item"><a href="./data-split.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">附录 B — 常见的数据划分方法</h1>
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">常见的数据划分方法</span></h1>
 </div>
 
 
@@ -512,61 +495,75 @@ ul.task-list li input[type="checkbox"] {
   </div>
   
 
+
 </header>
 
-<p>随着<strong>临床预测模型</strong>的愈加火爆，越来越多的医生/医学生开始搞临床预测模型，但其实这个东西已经很老了，并不是什么新鲜的东西。</p>
-<p>在我2018年左右刚开始学习生信数据挖掘的时候，临床预测模型就被广泛应用于各种生信SCI中，但它在临床中的使用，远比这个早得多！</p>
-<p>不知道什么原因最近又火起来了！（也有可能一直都很火，只不过我最近没关注它……）</p>
-<p>大家一定要明白，<strong>临床预测模型的本质就是机器学习</strong>，这其实是机器学习在生物医学领域的应用，不管怎么改头换面，都逃不出机器学习的各种方法。</p>
+
 <p>通常大家在做临床预测模型或者机器学习时，首先就是要<strong>划分数据</strong>，比如训练集/测试集划分、<strong>内部验证/外部验证</strong>，这些都属于重抽样技术。</p>
 <p>重抽样技术大家应该都不陌生，比如常用的<strong>K折交叉验证、bootstrap、训练集/测试集划分，等，都属于重抽样技术</strong>。</p>
-<p>它的基本思想是：<strong>对于一个数据集，先用其中一部分训练模型，然后用剩余的数据评估模型表现，这一过程会重复进行多次，最后对结果进行归纳汇总</strong>。</p>
-<p>使用<strong>重抽样技术有助于模型更好地“认识理解”数据，从而得到更加稳健的结果</strong>。这就好比让你看一本书，如果只看1次，可能什么也记不住，但是如果让你看10次，那效果肯定比只看1次要好。</p>
-<p>因为重抽样过程是随机的，它每次都会<strong>随机</strong>地从整个数据中抽取一部分，给模型学习，所以每次每次抽取的数据都不一样（既然是随机的，那也有可能一样），这样就让模型有机会认识全部的数据，从而提高模型稳定性。</p>
-<p>在临床预测模型领域大家经常听到<strong>内部验证、外部验证</strong>这种说法，其实很好理解。对于<strong>数据集A</strong>，我把它分成A1和A2两份，A1这部分数据用于训练模型，A2这部分数据用于评估模型表现，用来评估模型表现的这部分A2数据就是<strong>内部验证</strong>；假如此时我找来另一份<strong>数据集B</strong>，在数据集B上再次评估模型表现，那数据集B就是<strong>外部验证</strong>。</p>
-<p><strong>重抽样的方法有很多种</strong>，除了大家常见的K折交叉验证、bootstrap，还有蒙特卡洛交叉验证、留一法交叉验证等。</p>
-<p><strong>如何选择合适的重抽样方法呢？</strong>这个一定要和你的数据结合讨论，没有金标准！如果你是一个精通机器学习的人，那你肯定不会有这样的问题，所以说到底，这都是机器学习中的问题，一个临床的医务工作者不懂这些很正常。<strong>我会在文末给出一些方法选择建议供大家参考</strong>。</p>
-<section id="留出法holdout" class="level2" data-number="B.1">
-<h2 data-number="B.1" class="anchored" data-anchor-id="留出法holdout"><span class="header-section-number">B.1</span> 留出法(holdout)</h2>
-<p>大家最常使用的，把数据集随机划分为训练集(train)/测试集(test)的做法就是<code>holdout</code>，其中训练集用于建模，测试集用于评估模型表现。</p>
-<p>有时还会把数据划分为训练集(train)/测试集(test)/验证集(validation)，训练集用来训练模型，测试集查看模型表现，不断进行调整，然后训练集和测试集一起训练出一个模型，最后用验证集评估模型表现。</p>
+<p>它的基本思想是：<strong>对于一个数据集，先用其中一部分训练模型，然后用剩余的数据评估模型表现，这一过程会重复进行多次，最后对多个结果进行归纳汇总</strong>。</p>
+<p>使用<strong>重抽样技术有助于模型更好地“认识理解”数据，从而得到更加稳健的结果</strong>。只使用一个结果可能会得到偏差较大的结果，那我使用100次的结果是不是就更加稳健了呢？得到极端结果的可能性是不是就更小了呢？</p>
+<p>因为重抽样过程是随机的，它每次都会<strong>随机</strong>地从整个数据中抽取一部分，给模型学习，所以每次抽取的数据都不一样（既然是随机的，那也有可能一样），这样就让模型有机会认识全部的数据，从而提高模型稳定性。</p>
+<p>在临床预测模型领域大家经常听到<strong>内部验证、外部验证</strong>这种说法，其实很好理解。对于<strong>数据集A</strong>，我把它分成A1和A2两份，A1这部分数据用于训练模型，A2这部分数据用于评估模型表现，用来评估模型表现的这部分A2数据就是内部验证，因为虽然我们把A分成了A1和A2两部分，但是这两部分本质上还是一个来源的，所以这是内部验证；假如此时我找来另一份<strong>数据集B</strong>，在数据集B上再次评估模型表现，那数据集B就是外部验证。</p>
+<p>内外部验证其实是非常简单的概念，但是统计学家总是喜欢搞这些高大上的概念。我再推荐冯国双老师的一篇文章，大家可以阅读一下：<a href="https://mp.weixin.qq.com/s/-8DGbu002IqJQn1FwY8lqw">你以为的“外部验证”，其实只是内部验证</a></p>
+<p>重抽样的方法有很多种，除了大家常见的K折交叉验证、bootstrap，还有蒙特卡洛交叉验证、留一法交叉验证等。</p>
+<p>如何选择合适的重抽样方法呢？这个一定要和你的数据结合讨论，没有金标准！如果你是一个精通机器学习的人，那你肯定不会有这样的问题，所以说到底，这都是机器学习中的问题，一个临床的医务工作者不懂这些很正常。我会在文末给出一些方法选择建议供大家参考。</p>
+<section id="留出法holdout" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="留出法holdout"><span class="header-section-number">5.1</span> 留出法(holdout)</h2>
+<p>大家最常使用的，把数据集随机划分为训练集(train)/测试集(test)的做法就是<code>holdout</code>，其中训练集用于建模，测试集用于评估模型表现。测试集有时也被称为验证集(validation)。</p>
+<p>如果你的数据样本量足够大，大到几乎不可能产生错误的结果，那你可以大胆放心用这种方法，否则一般都<strong>不推荐只使用这种方法</strong>。</p>
+<p>通常的做法是把数据集划分为训练集/测试集后，在训练集中建立模型，当确定最终的模型后，我们会让模型对测试集进行预测，以评估模型最终的表现。</p>
 </section>
-<section id="交叉验证cross-validation" class="level2" data-number="B.2">
-<h2 data-number="B.2" class="anchored" data-anchor-id="交叉验证cross-validation"><span class="header-section-number">B.2</span> 交叉验证(cross validation)</h2>
+<section id="交叉验证cross-validation" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="交叉验证cross-validation"><span class="header-section-number">5.2</span> 交叉验证(cross validation)</h2>
 <p>交叉验证，意思就是一份数据既用作训练，也用作验证，互相交叉，主要有以下几种：</p>
-<p><strong>K折交叉验证(K fold cross validation)</strong>，就是把数据集随机分为K个样本量基本相同的子数据集。比如5折交叉验证，就是把数据集分为5个子集（比如分成A,B,C,D,E,5份），在建模时，首先会使用其中A,B,C,D,4份数据进行建模，然后用剩下的E数据评估模型表现，接下来使用A,B,C,E，4份数据建模，用剩下的D评估模型表现。这样依次进行5个循环，每份数据都会用来评估模型表现。最后将得到的5个模型表现结果进行汇总。</p>
-<p>下面是一个10折交叉验证的示意图：</p>
+<p><strong>K折交叉验证(K fold cross validation)</strong>，就是把数据集随机分为K个样本量基本相同的子数据集。比如5折交叉验证，就是把数据集分为5个子集（比如分成A,B,C,D,E,5份），在建模时，首先会使用其中A,B,C,D,4份数据进行建模，然后用剩下的E数据评估模型表现，接下来使用A,B,C,E，4份数据建模，用剩下的D评估模型表现。这样依次进行5个循环，每份数据都会用来评估模型表现。这样就会得到5个模型，就会有5个结果，最后将得到的5个模型表现结果进行汇总作为最终的结果。</p>
+<p>下面是一个5折交叉验证的示意图，我们把所有数据分为训练集和测试集，然后在训练集建立模型，建立模型时，对训练集使用了5折交叉验证的方法：</p>
 <p><img src="figs/Snipaste_2023-04-01_14-12-58.png" class="img-fluid"></p>
 <p><strong>留一交叉验证(LOOCV, leave one out cross validation)</strong>，是K折交叉验证的特例。每次都只留1个样本用于评估模型表现，所以这里的K其实就等于样本量，每一个样本都会被用来评估模型表现。</p>
 <p><strong>重复交叉验证(repeated cross validation)</strong>，也是K折交叉验证的扩展版本，比如，重复10次的5折交叉验证，就是把5折交叉验证这个过程重复10遍。</p>
 <p><strong>蒙特卡洛交叉验证(Monte Carlo cross validation)</strong>，也是交叉验证的一个变种。留出法是将数据集划分1次，而蒙特卡洛交叉验证就是将留出法进行多次。</p>
 </section>
-<section id="bootstrap" class="level2" data-number="B.3">
-<h2 data-number="B.3" class="anchored" data-anchor-id="bootstrap"><span class="header-section-number">B.3</span> bootstrap</h2>
+<section id="bootstrap" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="bootstrap"><span class="header-section-number">5.3</span> bootstrap</h2>
 <p>自助法，即有放回的随机抽样法。具体做法如下：</p>
-<p>比如，一个数据集有100个样本，每次随机抽取1个，然后放回，再随机抽取1个，这样的过程重复100次，就得到了一个<strong>和原数据集样本量相等的抽样数据集</strong>，这个抽样数据集就叫做自助集。</p>
-<p>由于每次都是有放回然后再随机抽取，所以一个自助集中可能有多个同一样本！所以就有可能在100次随机抽取中，有一些没被抽中过的样本，这些样本就被称为袋外样本(out of bag)，其中被抽中的样本(也就是自助集)用于训练模型，袋外样本用来评估模型表现。随机森林算法就是使用这种方法的！</p>
+<p>比如，一个数据集有100个样本，每次随机抽取1个，然后放回去，再随机抽取1个，再放回去，这样的过程重复100次，就得到了一个<strong>和原数据集样本量相等的抽样数据集</strong>，这个抽样数据集就叫做<strong>自助集</strong>或自助样本。</p>
+<p>由于每次都是有放回然后再随机抽取，所以一个自助集中可能有多个同一样本！所以就有可能在100次随机抽取中，有一些没被抽中过的样本，这些样本就被称为<strong>袋外样本</strong>(out-of-bag，OOB)，其中被抽中的样本(也就是自助集)用于训练模型，袋外样本用来评估模型表现。</p>
+<p>如果设置bootstrap的次数是10，就是抽取10个自助集，10个袋外样本，在每个自助集中训练一个模型，并在相应的袋外样本中评估模型，这样就会得到10个模型表现，对它们取平均值，就是最终的模型表现。</p>
 </section>
-<section id="其他方法" class="level2" data-number="B.4">
-<h2 data-number="B.4" class="anchored" data-anchor-id="其他方法"><span class="header-section-number">B.4</span> 其他方法</h2>
+<section id="其他方法" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="其他方法"><span class="header-section-number">5.4</span> 其他方法</h2>
 <p>除了以上方法，其实还有非常多没有介绍，比如在<code>mlr3</code>中经常使用的嵌套重抽样，这些大家感兴趣可以自行了解。</p>
 </section>
-<section id="重抽样的目的" class="level2" data-number="B.5">
-<h2 data-number="B.5" class="anchored" data-anchor-id="重抽样的目的"><span class="header-section-number">B.5</span> 重抽样的目的</h2>
-<p>经常有粉丝问我：<strong>为什么我用了各种方法，10折交叉验证、10折重复交叉验证、自助法，都用过了，为什么最后模型的表现还是很差？</strong></p>
-<p>看到类似的问题，我想这部分朋友可能把重抽样的目的搞错了，<strong>重抽样的目的不是为了提高模型表现，重抽样也确实不能提高模型表现！</strong>开头我已说过，重抽样技术是为了让模型更好的<strong>认识数据</strong>而已，这样能够得到更加稳健、无偏的结果，但是对于提高模型表现没有直接的影响哦~</p>
-<p>你可以这么理解，如果你不重抽样，可能某次结果的AUC是0.8，再做一次可能就变成0.5了，而你重抽样10次，得到的结果是10次的平均，这样的结果很明显是更加稳健的。</p>
-<p>模型表现好不好首先是数据原因，一个牛逼的数据不需要复杂的模型也能有很好的结果，数据预处理对数据影响很大，大家可以参考上面的推文。另外还和模型本身的性质有关，比如模型的超参数、模型本身的上限等，这些会在以后陆续介绍。</p>
+<section id="内部验证外部验证" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="内部验证外部验证"><span class="header-section-number">5.5</span> 内部验证/外部验证</h2>
+<p>临床预测模型中会有<strong>内部验证/外部验证</strong>的说法，内部验证又叫<strong>内部重抽样</strong>，其实没有任何特殊的地方，只是换个说法而已。</p>
+<p>一个数据集被随机划分为训练集和测试集，在训练集建立模型时，我们可能会对训练集使用K折交叉验证或者bootstrap等方法，这样可以使我们的模型更加稳健，避免出现极坏或者极好的结果。在训练集中使用K折交叉验证或者bootstrap等方法，就被叫做内部验证或者内部重抽样。在测试集（指建模时未使用过的数据）测试模型的表现，就叫做外部验证。</p>
+<p>下图是《R语言整洁建模》中的典型数据划分方法示意图，非常贴合临床预测模型的数据划分方法。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figs/PixPin_2024-04-27_19-11-28.png" class="img-fluid figure-img"></p>
+<figcaption>典型的数据划分方法</figcaption>
+</figure>
+</div>
+<p>首先我们会把所有数据划分为训练集和测试集，然后在训练集中建立模型，这个过程会对训练集使用另一种重抽样方法（比如交叉验证或者bootstrap等），每一次重抽样我们都会使用其中一部分数据用于拟合模型，另一部分数据用于评估模型，用于拟合模型的这部分数据被称为<strong>分析集</strong>，用于评估模型的数据被称为<strong>评估集</strong>。</p>
 </section>
-<section id="为什么要单独划分出一部分数据" class="level2" data-number="B.6">
-<h2 data-number="B.6" class="anchored" data-anchor-id="为什么要单独划分出一部分数据"><span class="header-section-number">B.6</span> 为什么要单独划分出一部分数据</h2>
+<section id="重抽样的目的" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="重抽样的目的"><span class="header-section-number">5.6</span> 重抽样的目的</h2>
+<p>经常有粉丝问我：为什么我用了各种方法，10折交叉验证、10折重复交叉验证、自助法，都用过了，为什么最后模型的表现还是很差？</p>
+<p>看到类似的问题，我想这部分朋友可能把重抽样的目的搞错了，<strong>重抽样的目的不是为了提高模型表现，重抽样也确实不能提高模型表现</strong>！开头我已说过，重抽样技术是为了让模型更好的<strong>认识数据</strong>而已，这样能够得到更加稳健、无偏的结果，但是对于提高模型表现没有直接的影响哦~</p>
+<p>你可以这么理解，如果你不重抽样，可能某一次结果的AUC是0.9，再做一次可能就变成0.5了，而你重抽样10次，得到的结果是10次的平均，这样的结果很明显是更加稳健的、误差小的。</p>
+<p>模型表现好不好首先是数据原因，一个牛逼的数据不需要复杂的模型也能有很好的结果，数据预处理对数据影响很大，大家可以参考下一章内容。另外还和模型本身的性质有关，比如模型的超参数、<a href="https://mp.weixin.qq.com/s/7WUAx43wfAMhrWkpVgUnaA">模型本身的上限</a>等，这些都会影响模型的表现。</p>
+</section>
+<section id="为什么要单独划分" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="为什么要单独划分"><span class="header-section-number">5.7</span> 为什么要单独划分</h2>
 <p>通常我们建立模型时，会把数据集A划分为A1和A2两份，A1用来训练模型，A2用来测试模型，在训练模型的过程中，完全不用使用到A2这部分数据。有些人不理解，把这种方法和嵌套重抽样混为一谈。其实这两个有着本质的区别。</p>
 <p>嵌套重抽样是在训练模型时使用的，把两份数据集全都用到了，而且两份数据集都会再叠加其他重抽样方法。</p>
 <p>但<strong>我们划分数据的目的是什么呢？我们是为了测试最终的模型表现</strong>。临床问题数据很珍贵，通常都只有1份，这种情况下我把这份数据全都用于训练模型，那我用什么测试训练出来的模型好坏呢？有的人喜欢把训练好的模型作用于用来训练模型的数据上，发现结果竟然很好，这样是不对的，这叫数据泄露，你的数据模型已经<strong>学习</strong>过了，这不是作弊吗？这样的模型结果能说明什么问题呢？</p>
-<p>所以一开始把数据就划分为2份是一个很好的解决方法。如果你有很多个数据集，你完全可以在其中1个数据集中使用各种方法建模。</p>
+<p>所以一开始把数据就划分为2份是一个很好的解决方法。如果你有很多个数据集，你完全可以在其中1个数据集中使用各种方法建模。比如，你的临床试验有多个分中心，你完全可以使用其中1个或几个中心的数据建立模型，然后在其余中心的数据中评估最终的模型。</p>
 </section>
-<section id="方法选择建议" class="level2" data-number="B.7">
-<h2 data-number="B.7" class="anchored" data-anchor-id="方法选择建议"><span class="header-section-number">B.7</span> 方法选择建议</h2>
+<section id="方法选择建议" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="方法选择建议"><span class="header-section-number">5.8</span> 方法选择建议</h2>
 <p>以上就是一些常见的重抽样方法，可以看到每种方法都强调一个问题，那就是<strong>随机</strong>！，只有随机，才能保证模型学习到这个数据集中的更多信息，才能获得稳健的模型表现！</p>
 <p><strong>以下是一些方法选择建议：</strong></p>
 <ol type="1">
@@ -616,18 +613,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -659,11 +645,50 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
-  function tippyHover(el, contentFn) {
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/ayueme\.github\.io\/R_clinical_model\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -673,8 +698,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -686,7 +720,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -730,6 +887,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -755,6 +913,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -816,26 +1000,31 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./data-preprocess.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">常见的数据预处理方法</span></span>
+      <a href="./模型建立和可视化.html" class="pagination-link" aria-label="模型建立和可视化">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">模型建立和可视化</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./9999-appendix.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">其他合集</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./data-preprocess.html" class="pagination-link" aria-label="常见的数据预处理方法">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">常见的数据预处理方法</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">R语言实战临床预测模型 was written by 阿越.</div>   
+    <div class="nav-footer-left">
+<p>R语言实战临床预测模型 by 阿越.</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
-    </div>
-    <div class="nav-footer-right">本书由 <a href="https://quarto.org/">Quarto</a> 强力驱动.</div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/ayueme/R_clinical_model/issues/new" class="toc-action"><i class="bi bi-github"></i>报告问题</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>本书由 <a href="https://quarto.org/">Quarto</a> 强力驱动.</p>
+</div>
   </div>
 </footer>
+
 
 
 
